@@ -1,0 +1,22 @@
+{
+  "name": "掼蛋在线对战",
+  "short_name": "掼蛋",
+  "description": "掼蛋在线对战游戏，4人实时联网对战",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0a4d2e",
+  "theme_color": "#0a4d2e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

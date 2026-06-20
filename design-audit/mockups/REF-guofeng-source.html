@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掼蛋 · 重设计稿(国风·精炼)— frontend-design 方向提案</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:#0c0a08;}
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;
+  font-family:'Noto Serif SC','Songti SC',serif;}
+.board{position:relative;width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;
+  background:
+    radial-gradient(120% 80% at 50% 36%, #20242a 0%, #15171c 46%, #0d0e11 100%);
+  overflow:hidden;border-radius:10px;
+  box-shadow:inset 0 0 160px rgba(0,0,0,.6), 0 0 0 1px rgba(198,161,91,.18);}
+/* 宣纸纹理 + 暗角 */
+.board::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 3px);
+  mix-blend-mode:overlay;}
+.board::after{content:"";position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 220px rgba(0,0,0,.55);}
+.rise{opacity:0;animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards;}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── HUD 左上：级牌印章 + 局况 ── */
+.hud{position:absolute;top:3.2%;left:2.6%;display:flex;align-items:center;gap:14px;z-index:5;}
+.seal{width:62px;height:62px;border-radius:9px;background:linear-gradient(160deg,#b3392c,#8f291f);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,225,200,.25);
+  border:1px solid rgba(255,210,180,.3);}
+.seal .lvllab{font-size:9px;letter-spacing:.3em;color:#f3d9c4;opacity:.8;}
+.seal .lvl{font-family:'Ma Shan Zheng',serif;font-size:34px;color:#fbeede;line-height:.8;margin-top:1px;}
+.hud .meta{color:#cdbfa6;}
+.hud .meta .t{font-size:11px;letter-spacing:.22em;color:#9a8f78;text-transform:uppercase;}
+.hud .meta .s{font-family:'Fraunces',serif;font-size:17px;color:#E9E0CF;margin-top:2px;}
+.hud .meta .s b{color:#C6A15B;}
+
+/* ── 座位 ── */
+.seat{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:4;}
+.seat.partner{top:5.5%;left:50%;transform:translateX(-50%);}
+.seat.left{left:3%;top:42%;}
+.seat.right{right:3%;top:42%;}
+.avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:'Ma Shan Zheng',serif;font-size:26px;color:#0d0e11;
+  background:radial-gradient(circle at 35% 30%,#e8dcc2,#bfae8e);
+  box-shadow:0 2px 8px rgba(0,0,0,.5);}
+.seat.ally .avatar{box-shadow:0 0 0 3px #C6A15B, 0 0 18px rgba(198,161,91,.5);}     /* 我方/队友:暖金 */
+.seat.opp  .avatar{box-shadow:0 0 0 2px rgba(78,140,122,.55);}                       /* 对手:冷玉 */
+.seat.opp.active .avatar{box-shadow:0 0 0 3px #4E8C7A, 0 0 18px rgba(78,140,122,.55);animation:pulse 1.2s ease-in-out infinite;}
+@keyframes pulse{50%{box-shadow:0 0 0 4px #5fa890,0 0 26px rgba(95,168,144,.7);}}
+.seat .nm{font-size:12px;color:#cdbfa6;letter-spacing:.08em;}
+.seat .nm .role{font-size:10px;color:#8a7f68;margin-left:5px;}
+.cnt{font-size:11px;font-weight:700;color:#1a1712;background:#C6A15B;border-radius:100px;padding:1px 9px;font-family:'Fraunces',serif;}
+.seat.opp .cnt{background:#4E8C7A;color:#0c100e;}
+/* 对手手牌(背面叠片) */
+.backfan{display:flex;}
+.backfan i{display:block;width:13px;height:20px;margin-left:-7px;border-radius:3px;
+  background:linear-gradient(135deg,#7d2820,#4f1813);border:1px solid rgba(255,210,180,.18);}
+.backfan i:first-child{margin-left:0;}
+
+/* ── 中央出牌舞台 ── */
+.stage{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);
+  width:46%;min-height:120px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:3;}
+.stage .who{font-size:11px;letter-spacing:.2em;color:#9a8f78;}
+.stage .who b{color:#C6A15B;font-family:'Noto Serif SC',serif;}
+.played{display:flex;}
+.card{width:54px;height:76px;border-radius:7px;background:linear-gradient(180deg,#F6F1E4,#ece4d0);
+  position:relative;box-shadow:0 3px 8px rgba(0,0,0,.45);border:1px solid rgba(0,0,0,.12);}
+.played .card{margin-left:-26px;}.played .card:first-child{margin-left:0;}
+.card .rk{position:absolute;top:5px;left:6px;font-family:'Fraunces',serif;font-weight:700;font-size:16px;line-height:1;}
+.card .su{position:absolute;top:21px;left:7px;font-size:11px;}
+.card .big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:30px;opacity:.16;}
+.r{color:#C0392B;}.b{color:#1C1C24;}
+.stage .tag{font-size:11px;color:#C6A15B;border:1px solid rgba(198,161,91,.4);border-radius:100px;padding:2px 12px;letter-spacing:.1em;}
+
+/* ── 我方手牌 ── */
+.myseat{position:absolute;bottom:15.5%;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:4;}
+.myseat .me{display:flex;align-items:center;gap:10px;}
+.hand{display:flex;align-items:flex-end;}
+.hand .card{width:46px;height:66px;margin-left:-20px;transition:transform .18s;}
+.hand .card:first-child{margin-left:0;}
+.hand .card.sel{transform:translateY(-16px);box-shadow:0 12px 22px rgba(0,0,0,.5),0 0 0 2px #C6A15B,0 0 14px rgba(198,161,91,.45);}
+.hand .card .rk{font-size:13px;top:4px;left:5px;}.hand .card .su{font-size:9px;top:17px;left:6px;}
+
+/* ── 操作区 ── */
+.actions{position:absolute;bottom:3.5%;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:6;}
+.btn{font-family:'Noto Serif SC',serif;font-size:14px;padding:10px 22px;border-radius:10px;cursor:pointer;border:1px solid transparent;letter-spacing:.12em;}
+.btn.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);color:rgba(255,255,255,.8);}
+.btn.sec{background:#3D6B8A;color:#eef2ee;}
+.btn.cta{background:linear-gradient(180deg,#d24a3b,#b3392c);color:#fbeede;font-weight:700;
+  box-shadow:0 4px 14px rgba(179,57,44,.45),inset 0 1px 0 rgba(255,225,200,.3);border:1px solid rgba(255,210,180,.3);}
+.note{position:absolute;bottom:1%;left:50%;transform:translateX(-50%);font-size:10px;color:#6b6353;letter-spacing:.1em;}
+</style>
+</head>
+<body>
+<div class="board">
+  <!-- HUD -->
+  <div class="hud rise" style="animation-delay:.05s">
+    <div class="seal"><span class="lvllab">级牌</span><span class="lvl">贰</span></div>
+    <div class="meta">
+      <div class="t">本局 · 我方进贡</div>
+      <div class="s">我方 <b>打 2</b> · 对手 打 5　|　第 3 副</div>
+    </div>
+  </div>
+
+  <!-- 队友(上) -->
+  <div class="seat partner ally rise" style="animation-delay:.12s">
+    <div class="avatar">友</div>
+    <div class="backfan">{{B12}}</div>
+    <div class="nm">老搭子 <span class="role">队友</span></div>
+    <div class="cnt">12 张</div>
+  </div>
+
+  <!-- 左对手 -->
+  <div class="seat left opp rise" style="animation-delay:.18s">
+    <div class="avatar">西</div>
+    <div class="nm">西家 <span class="role">对手</span></div>
+    <div class="cnt">9 张</div>
+  </div>
+
+  <!-- 右对手(出牌中) -->
+  <div class="seat right opp active rise" style="animation-delay:.2s">
+    <div class="avatar">东</div>
+    <div class="nm">东家 <span class="role">出牌中…</span></div>
+    <div class="cnt">7 张</div>
+  </div>
+
+  <!-- 中央舞台:东家刚出一个顺子 -->
+  <div class="stage rise" style="animation-delay:.28s">
+    <div class="who">东家 出 <b>顺子</b></div>
+    <div class="played">
+      <div class="card"><span class="rk b">9</span><span class="su b">♣</span><span class="big b">9</span></div>
+      <div class="card"><span class="rk r">10</span><span class="su r">♦</span><span class="big r">10</span></div>
+      <div class="card"><span class="rk b">J</span><span class="su b">♠</span><span class="big b">J</span></div>
+      <div class="card"><span class="rk r">Q</span><span class="su r">♥</span><span class="big r">Q</span></div>
+      <div class="card"><span class="rk b">K</span><span class="su b">♠</span><span class="big b">K</span></div>
+    </div>
+    <div class="tag">轮到你 · 可压可不出</div>
+  </div>
+
+  <!-- 我方手牌 + 名 -->
+  <div class="myseat rise" style="animation-delay:.34s">
+    <div class="me">
+      <div class="cnt" style="background:#C6A15B">你 · 18 张</div>
+    </div>
+    <div class="hand">
+      <div class="card"><span class="rk b">3</span><span class="su b">♠</span></div>
+      <div class="card"><span class="rk r">5</span><span class="su r">♥</span></div>
+      <div class="card sel"><span class="rk b">10</span><span class="su b">♣</span></div>
+      <div class="card sel"><span class="rk r">J</span><span class="su r">♦</span></div>
+      <div class="card sel"><span class="rk b">Q</span><span class="su b">♠</span></div>
+      <div class="card sel"><span class="rk r">K</span><span class="su r">♥</span></div>
+      <div class="card sel"><span class="rk b">A</span><span class="su b">♠</span></div>
+      <div class="card"><span class="rk r">2</span><span class="su r">♦</span></div>
+      <div class="card"><span class="rk r">2</span><span class="su r">♥</span></div>
+      <div class="card"><span class="rk b">小</span><span class="su b" style="font-size:8px">王</span></div>
+      <div class="card"><span class="rk r">大</span><span class="su r" style="font-size:8px">王</span></div>
+    </div>
+  </div>
+
+  <!-- 操作区 -->
+  <div class="actions rise" style="animation-delay:.42s">
+    <button class="btn ghost">理牌</button>
+    <button class="btn ghost">提示</button>
+    <button class="btn sec">不出</button>
+    <button class="btn cta">出牌 · 大顺</button>
+  </div>
+
+  <div class="note">重设计稿(国风·精炼)· frontend-design 方向提案 · 非最终实现</div>
+</div>
+<script>
+  // 队友背面牌:把 {{B12}} 占位渲染成 12 张背面
+  document.querySelectorAll('.backfan').forEach(el=>{
+    if(el.textContent.includes('{{B12}}')){ el.innerHTML = Array(12).fill('<i></i>').join(''); }
+  });
+</script>
+</body>
+</html>

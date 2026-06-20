@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>掼蛋 · 牌社</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+:root{
+  --wood:#2a1c12;          /* 胡桃木 */
+  --wood2:#3a281a;
+  --felt:#1f4634;          /* 绿呢 */
+  --felt-lit:#2c5e46;
+  --brass:#c9a24a;         /* 黄铜 */
+  --brass-lit:#e7c873;
+  --cream:#efe2c6;         /* 暖米 */
+  --cream-dim:#bfae8e;
+  --ember:#c0562a;         /* 暖橙红 */
+  --ink:#241a12;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Noto Sans SC',sans-serif;color:var(--cream);min-height:100%;overflow-x:hidden;position:relative;
+  background:
+    radial-gradient(80% 55% at 50% 30%, rgba(231,200,115,.10), transparent 60%),
+    repeating-linear-gradient(92deg, rgba(0,0,0,.05) 0 3px, transparent 3px 7px),
+    linear-gradient(160deg, #34241700, #1a1109),
+    var(--wood);
+}
+/* 暖光聚光 + 木纹 */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(60% 45% at 50% 26%, rgba(255,220,150,.14), transparent 62%);
+}
+/* 颗粒 */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+  background-image:repeating-conic-gradient(#fff 0 0.0006turn, #000 0.0006turn 0.0012turn);background-size:3px 3px;
+}
+.frame{position:relative;z-index:1;max-width:940px;margin:0 auto;padding:46px 40px 80px;display:flex;flex-direction:column;align-items:center}
+
+.tag{font-size:12px;letter-spacing:.4em;color:var(--brass);margin-bottom:30px;display:flex;align-items:center;gap:12px}
+.tag::before,.tag::after{content:"❖";color:var(--brass);opacity:.6;font-size:10px}
+
+/* 牌匾标题 */
+.plaque{
+  position:relative;background:linear-gradient(180deg,var(--felt-lit),var(--felt));
+  border:3px solid var(--brass);border-radius:10px;padding:22px 64px 26px;text-align:center;
+  box-shadow:0 0 0 1px rgba(0,0,0,.4),0 16px 40px -18px #000, inset 0 2px 12px rgba(0,0,0,.4);
+  margin-bottom:8px;
+}
+.plaque::before,.plaque::after{content:"";position:absolute;width:13px;height:13px;border:2px solid var(--brass-lit);border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6dd,var(--brass));top:10px}
+.plaque::before{left:10px}.plaque::after{right:10px}
+.plaque .brand{
+  font-family:'Noto Serif SC';font-weight:900;font-size:96px;line-height:1;letter-spacing:.12em;padding-left:.12em;
+  color:var(--brass-lit);
+  text-shadow:0 2px 0 #6b4f1f,0 3px 2px rgba(0,0,0,.6);
+}
+.plaque .brand b{color:var(--ember);text-shadow:0 2px 0 #5a2210,0 3px 3px rgba(0,0,0,.6)}
+.sub{font-family:'ZCOOL XiaoWei';font-size:20px;letter-spacing:.4em;color:var(--cream-dim);margin:22px 0 42px;padding-left:.4em}
+
+/* 昵称 */
+.field{width:min(440px,100%);margin-bottom:38px}
+.field label{display:block;font-size:13px;color:var(--brass);letter-spacing:.3em;margin:0 0 10px 4px}
+.field .wrap{position:relative;background:rgba(20,12,6,.5);border:2px solid var(--wood2);border-radius:8px;box-shadow:inset 0 2px 8px rgba(0,0,0,.5)}
+.field input{
+  width:100%;background:transparent;border:none;padding:14px 16px;color:var(--cream);
+  font-family:'Noto Serif SC';font-weight:500;font-size:19px;outline:none;
+}
+.field input::placeholder{color:var(--cream-dim);opacity:.6}
+.field .wrap:focus-within{border-color:var(--brass)}
+
+.section{align-self:stretch;text-align:center;margin:2px 0 22px;position:relative}
+.section span{font-family:'ZCOOL XiaoWei';font-size:22px;letter-spacing:.3em;color:var(--brass-lit);background:linear-gradient(180deg,transparent 60%,rgba(201,162,74,.15));padding:0 18px}
+.section::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:linear-gradient(90deg,transparent,var(--brass),transparent);opacity:.4;z-index:-1}
+
+.slots{align-self:stretch;display:grid;gap:16px}
+.slot{
+  background:
+    linear-gradient(180deg, rgba(58,40,26,.7), rgba(30,20,12,.7));
+  border:2px solid var(--wood2);border-radius:9px;padding:18px 20px;position:relative;
+  box-shadow:0 10px 26px -16px #000, inset 0 1px 0 rgba(231,200,115,.12);
+}
+.slot::before{content:"";position:absolute;inset:5px;border:1px solid rgba(201,162,74,.18);border-radius:6px;pointer-events:none}
+.slot-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.role{font-family:'Noto Serif SC';font-weight:700;font-size:17px;letter-spacing:.1em;color:var(--cream);display:flex;align-items:center;gap:9px}
+.role .mk{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:1.5px solid var(--brass);font-size:12px;color:var(--brass)}
+.role.foe .mk{border-color:var(--ember);color:var(--ember)}
+.cur{font-family:'ZCOOL XiaoWei';font-size:24px;color:var(--brass-lit)}
+
+.tiers{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.tier{
+  text-align:center;padding:12px 4px 10px;border:1px solid var(--wood2);border-radius:6px;
+  background:rgba(20,12,6,.4);cursor:pointer;transition:.2s;
+}
+.tier .ic{font-size:21px;display:block;margin-bottom:5px;filter:sepia(.3)}
+.tier .nm{font-family:'Noto Serif SC';font-weight:600;font-size:14px;color:var(--cream-dim);letter-spacing:.08em}
+.tier.on{
+  background:linear-gradient(180deg,var(--brass-lit),var(--brass));border-color:var(--brass-lit);
+  box-shadow:0 6px 16px -8px rgba(201,162,74,.7),inset 0 1px 2px rgba(255,255,255,.4);
+}
+.tier.on .nm{color:var(--ink)}
+.tier.on .ic{filter:none}
+.desc{margin-top:13px;font-size:13px;color:var(--cream-dim);letter-spacing:.06em;text-align:center;font-style:italic;opacity:.85}
+
+.go{
+  margin-top:38px;align-self:stretch;cursor:pointer;
+  background:linear-gradient(180deg,var(--ember),#9c3e1c);color:var(--cream);
+  border:2px solid var(--brass);padding:17px;border-radius:9px;
+  font-family:'Noto Serif SC';font-weight:900;font-size:20px;letter-spacing:.5em;padding-left:.5em;
+  box-shadow:0 12px 30px -14px #000, inset 0 1px 0 rgba(255,255,255,.2);transition:.25s;
+}
+.go:hover{filter:brightness(1.08);transform:translateY(-1px)}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="tag">老 牌 社 · 掼 蛋 雅 座</div>
+
+  <div class="plaque">
+    <div class="brand">掼<b>蛋</b></div>
+  </div>
+  <div class="sub">单 机 牌 局 · 五 档 对 家</div>
+
+  <div class="field">
+    <label>报 个 名 号</label>
+    <div class="wrap"><input placeholder="贵姓大名……"></div>
+  </div>
+
+  <div class="section"><span>摆 桌 设 局</span></div>
+
+  <div class="slots">
+    <div class="slot">
+      <div class="slot-head"><div class="role"><span class="mk">友</span>队友</div><div class="cur">进阶</div></div>
+      <div class="tiers">
+        <div class="tier"><span class="ic">🐣</span><span class="nm">新手</span></div>
+        <div class="tier"><span class="ic">🎲</span><span class="nm">休闲</span></div>
+        <div class="tier on"><span class="ic">🎯</span><span class="nm">进阶</span></div>
+        <div class="tier"><span class="ic">🧠</span><span class="nm">高手</span></div>
+        <div class="tier"><span class="ic">👑</span><span class="nm">大师</span></div>
+      </div>
+      <div class="desc">很少失误，要动脑</div>
+    </div>
+
+    <div class="slot">
+      <div class="slot-head"><div class="role foe"><span class="mk">敌</span>对手一</div><div class="cur">高手</div></div>
+      <div class="tiers">
+        <div class="tier"><span class="ic">🐣</span><span class="nm">新手</span></div>
+        <div class="tier"><span class="ic">🎲</span><span class="nm">休闲</span></div>
+        <div class="tier"><span class="ic">🎯</span><span class="nm">进阶</span></div>
+        <div class="tier on"><span class="ic">🧠</span><span class="nm">高手</span></div>
+        <div class="tier"><span class="ic">👑</span><span class="nm">大师</span></div>
+      </div>
+      <div class="desc">残局会精算，难缠</div>
+    </div>
+
+    <div class="slot">
+      <div class="slot-head"><div class="role foe"><span class="mk">敌</span>对手二</div><div class="cur">大师</div></div>
+      <div class="tiers">
+        <div class="tier"><span class="ic">🐣</span><span class="nm">新手</span></div>
+        <div class="tier"><span class="ic">🎲</span><span class="nm">休闲</span></div>
+        <div class="tier"><span class="ic">🎯</span><span class="nm">进阶</span></div>
+        <div class="tier"><span class="ic">🧠</span><span class="nm">高手</span></div>
+        <div class="tier on"><span class="ic">👑</span><span class="nm">大师</span></div>
+      </div>
+      <div class="desc">全程搜索，顶级水平</div>
+    </div>
+  </div>
+
+  <button class="go">入 座 · 开 牌</button>
+</div>
+</body>
+</html>

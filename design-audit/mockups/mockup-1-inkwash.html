@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>掼蛋 · 墨韵</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700;900&display=swap');
+
+:root{
+  --paper:#ece3cf;        /* 宣纸 */
+  --paper-deep:#e2d6ba;
+  --ink:#1c1a17;          /* 墨 */
+  --ink-soft:#4a4540;
+  --ink-faint:#8a8175;
+  --cinnabar:#b0301f;     /* 朱砂 */
+  --cinnabar-deep:#8c2418;
+  --seal:#c0392b;
+  --jade:#3f6b54;         /* 一点石青/墨绿做点缀 */
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Noto Serif SC',serif;
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(63,107,84,.10), transparent 55%),
+    radial-gradient(140% 90% at 95% 100%, rgba(176,48,31,.08), transparent 50%),
+    radial-gradient(60% 60% at 50% 42%, rgba(28,26,23,.05), transparent 70%),
+    var(--paper);
+  color:var(--ink);
+  min-height:100%;
+  position:relative;
+  overflow-x:hidden;
+}
+/* 宣纸纤维纹理 */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.012) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.012) 0 1px, transparent 1px 4px);
+  mix-blend-mode:multiply;
+}
+/* 墨色卷轴边 */
+.frame{
+  position:relative;z-index:1;max-width:980px;margin:0 auto;padding:54px 40px 80px;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+}
+
+/* 顶部一行小字 + 闲章 */
+.tag{
+  display:flex;align-items:center;gap:14px;align-self:stretch;justify-content:center;
+  color:var(--ink-faint);font-size:13px;letter-spacing:.5em;font-weight:500;
+  margin-bottom:42px;
+}
+.tag::before,.tag::after{content:"";height:1px;width:80px;background:linear-gradient(90deg,transparent,var(--ink-faint));}
+.tag::after{transform:scaleX(-1)}
+
+/* 标题 */
+.hero{text-align:center;position:relative;margin-bottom:8px}
+.hero .brand{
+  font-family:'Ma Shan Zheng',cursive;
+  font-size:148px;line-height:.92;color:var(--ink);
+  letter-spacing:.04em;
+  text-shadow:0 2px 0 rgba(0,0,0,.04);
+}
+.hero .brand .d2{color:var(--cinnabar)}
+/* 朱砂印章 */
+.seal{
+  position:absolute;top:8px;right:calc(50% - 200px);
+  width:78px;height:78px;border:3px solid var(--seal);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  color:var(--seal);font-weight:700;font-size:22px;line-height:1.05;
+  transform:rotate(-6deg);
+  box-shadow:inset 0 0 0 1px rgba(192,57,43,.4);
+  font-family:'Noto Serif SC';letter-spacing:.05em;
+  opacity:.92;
+}
+.subtitle{
+  text-align:center;color:var(--ink-soft);font-size:17px;letter-spacing:.45em;
+  margin:18px 0 46px;font-weight:500;padding-left:.45em;
+}
+
+/* 昵称 */
+.field{width:min(440px,100%);margin-bottom:40px}
+.field label{display:block;font-size:13px;color:var(--ink-faint);letter-spacing:.3em;margin:0 0 10px 4px}
+.field input{
+  width:100%;background:rgba(255,255,255,.35);border:none;border-bottom:2px solid var(--ink);
+  padding:14px 6px;font-family:'Noto Serif SC';font-size:20px;color:var(--ink);
+  outline:none;transition:.3s;
+}
+.field input::placeholder{color:var(--ink-faint)}
+.field input:focus{border-color:var(--cinnabar);background:rgba(255,255,255,.55)}
+
+/* 配置标题 */
+.section-title{align-self:stretch;display:flex;align-items:center;gap:16px;margin:6px 0 22px;}
+.section-title span{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:.2em;white-space:nowrap}
+.section-title::after{content:"";flex:1;height:1px;background:var(--paper-deep);border-top:1px dashed var(--ink-faint);opacity:.5}
+
+/* 三个对手卡 */
+.slots{align-self:stretch;display:grid;gap:18px}
+.slot{
+  background:linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,.18));
+  border:1px solid rgba(28,26,23,.16);
+  border-radius:4px;padding:20px 22px;position:relative;
+  box-shadow:0 1px 0 rgba(255,255,255,.5) inset, 0 8px 22px -16px rgba(28,26,23,.5);
+}
+.slot::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;background:var(--cinnabar);opacity:.7}
+.slot-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.role{font-size:16px;font-weight:700;letter-spacing:.15em;color:var(--ink)}
+.role .mk{color:var(--jade);margin-right:8px}
+.role.foe .mk{color:var(--cinnabar)}
+.cur{font-family:'Ma Shan Zheng',cursive;font-size:26px;color:var(--cinnabar)}
+
+.tiers{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.tier{
+  text-align:center;padding:13px 4px 11px;border:1px solid rgba(28,26,23,.18);
+  border-radius:3px;background:rgba(236,227,207,.5);cursor:pointer;transition:.2s;
+}
+.tier .ic{font-size:22px;display:block;margin-bottom:5px;filter:grayscale(.3)}
+.tier .nm{font-size:14px;font-weight:600;color:var(--ink-soft);letter-spacing:.1em}
+.tier.on{
+  background:var(--ink);border-color:var(--ink);
+  box-shadow:0 6px 16px -8px rgba(28,26,23,.7);
+}
+.tier.on .nm{color:var(--paper)}
+.tier.on .ic{filter:none}
+.tier.on::after{content:"";position:absolute}
+.desc{margin-top:13px;font-size:13px;color:var(--ink-faint);letter-spacing:.08em;font-style:italic}
+
+/* 开始 */
+.go{
+  margin-top:38px;align-self:stretch;
+  background:var(--cinnabar);color:var(--paper);
+  border:none;padding:18px;border-radius:4px;cursor:pointer;
+  font-family:'Noto Serif SC';font-size:20px;font-weight:700;letter-spacing:.5em;padding-left:.5em;
+  box-shadow:0 10px 26px -12px var(--cinnabar-deep);transition:.25s;
+  position:relative;overflow:hidden;
+}
+.go:hover{background:var(--cinnabar-deep);transform:translateY(-1px)}
+.go .seal-s{font-family:'Ma Shan Zheng';font-size:24px}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="tag">江 苏 淮 安 · 掼 蛋</div>
+
+  <div class="hero">
+    <div class="seal">壹局<br>定胜</div>
+    <div class="brand">掼<span class="d2">蛋</span></div>
+  </div>
+  <div class="subtitle">单 机 雅 局 · 五 档 对 手</div>
+
+  <div class="field">
+    <label>署 名</label>
+    <input placeholder="请落款……">
+  </div>
+
+  <div class="section-title"><span>对 局 设 置</span></div>
+
+  <div class="slots">
+    <div class="slot">
+      <div class="slot-head"><div class="role"><span class="mk">◆</span>队友</div><div class="cur">进阶</div></div>
+      <div class="tiers">
+        <div class="tier"><span class="ic">🐣</span><span class="nm">新手</span></div>
+        <div class="tier"><span class="ic">🎲</span><span class="nm">休闲</span></div>
+        <div class="tier on"><span class="ic">🎯</span><span class="nm">进阶</span></div>
+        <div class="tier"><span class="ic">🧠</span><span class="nm">高手</span></div>
+        <div class="tier"><span class="ic">👑</span><span class="nm">大师</span></div>
+      </div>
+      <div class="desc">很少失误，要动脑</div>
+    </div>
+
+    <div class="slot">
+      <div class="slot-head"><div class="role foe"><span class="mk">✕</span>对手一</div><div class="cur">高手</div></div>
+      <div class="tiers">
+        <div class="tier"><span class="ic">🐣</span><span class="nm">新手</span></div>
+        <div class="tier"><span class="ic">🎲</span><span class="nm">休闲</span></div>
+        <div class="tier"><span class="ic">🎯</span><span class="nm">进阶</span></div>
+        <div class="tier on"><span class="ic">🧠</span><span class="nm">高手</span></div>
+        <div class="tier"><span class="ic">👑</span><span class="nm">大师</span></div>
+      </div>
+      <div class="desc">残局会精算，难缠</div>
+    </div>
+
+    <div class="slot">
+      <div class="slot-head"><div class="role foe"><span class="mk">✕</span>对手二</div><div class="cur">大师</div></div>
+      <div class="tiers">
+        <div class="tier"><span class="ic">🐣</span><span class="nm">新手</span></div>
+        <div class="tier"><span class="ic">🎲</span><span class="nm">休闲</span></div>
+        <div class="tier"><span class="ic">🎯</span><span class="nm">进阶</span></div>
+        <div class="tier"><span class="ic">🧠</span><span class="nm">高手</span></div>
+        <div class="tier on"><span class="ic">👑</span><span class="nm">大师</span></div>
+      </div>
+      <div class="desc">全程搜索，顶级水平</div>
+    </div>
+  </div>
+
+  <button class="go">开 局 <span class="seal-s">·</span> 入 席</button>
+</div>
+</body>
+</html>

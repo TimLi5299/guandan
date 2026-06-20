@@ -1,0 +1,33 @@
+{
+  "id": "02",
+  "title": "牌型详解：从单张到钢板",
+  "type": "sandbox_game",
+  "currentLevel": 2,
+  "sandboxConfig": { "mode": "random", "cardsPerPlayer": 10 },
+  "steps": [
+    {
+      "stepId": 1,
+      "prompt": "掼蛋的基本牌型有：单张、对子(2张相同)、三同张(3张相同)。先来出一张单牌！",
+      "expectedAction": "PLAY_SINGLE",
+      "highlightArea": "hand",
+      "onCorrect": { "message": "单张✓" },
+      "onWrong": { "hint": "只选一张牌，然后点出牌" }
+    },
+    {
+      "stepId": 2,
+      "prompt": "对子是两张点数相同的牌(比如两个5)。试着找两张相同的牌出个对子！",
+      "expectedAction": "PLAY_PAIR",
+      "highlightArea": "hand",
+      "onCorrect": { "message": "对子✓ 对子比单张更好，因为一次可以出两张！" },
+      "onWrong": { "hint": "找两张点数相同的牌(比如 ♠5 和 ♥5)选中后出牌" }
+    },
+    {
+      "stepId": 3,
+      "prompt": "顺子是5张或更多连续点数的牌（不含2和王）。比如3-4-5-6-7就是顺子。现在随便出一组合法的牌。",
+      "expectedAction": "PLAY_ANY",
+      "highlightArea": "hand",
+      "onCorrect": { "message": "很好！你已经掌握了基本牌型。" },
+      "onWrong": { "hint": "选1张或多张合法的牌出掉" }
+    }
+  ]
+}

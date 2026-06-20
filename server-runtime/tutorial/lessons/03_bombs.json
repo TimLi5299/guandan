@@ -1,0 +1,34 @@
+{
+  "id": "03",
+  "title": "炸弹：最强大的武器",
+  "type": "sandbox_game",
+  "currentLevel": 2,
+  "sandboxConfig": {
+    "mode": "seeded",
+    "cardsPerPlayer": 10,
+    "requirements": [{ "type": "has_bomb" }]
+  },
+  "steps": [
+    {
+      "stepId": 1,
+      "prompt": "炸弹！4张或更多相同点数的牌就是炸弹。炸弹可以打败任何普通牌！先看看你手里有没有炸弹(4张相同的牌)。",
+      "expectedAction": "NEXT",
+      "highlightArea": "hand"
+    },
+    {
+      "stepId": 2,
+      "prompt": "炸弹从小到大：4张炸 < 5张炸 < 6张炸 < 同花顺 < 7张炸 < 8张炸 < 天王炸(4张王)。天王炸无敌！现在，试着选出手里的炸弹出掉！",
+      "expectedAction": "PLAY_BOMB",
+      "highlightArea": "hand",
+      "onCorrect": { "message": "炸弹出击！炸弹是关键时刻的保命牌，不到紧急情况不要轻易用。" },
+      "onWrong": { "hint": "选4张或更多点数相同的牌就是炸弹" }
+    },
+    {
+      "stepId": 3,
+      "prompt": "炸弹使用时机：当对手快赢了（只剩少量牌），或者需要夺回出牌权时才用炸弹。平时要留着！",
+      "expectedAction": "NEXT",
+      "highlightArea": "none",
+      "onCorrect": { "message": "太棒了！你已经了解炸弹的基本用法。" }
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+# 冻结梯队快照不进 git（靠 build-ladder.sh + commit hash 一键重建）
+.ladder/

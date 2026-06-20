@@ -1,0 +1,214 @@
+/* ============================================================================
+ * 掼蛋游戏 · 设计 Token 系统
+ * 版本：v1.0 · 阶段 0 (基础设施)
+ *
+ * 来源：design-audit/DESIGN_TOKENS.md（设计宪法）
+ * 性质：所有视觉决策的唯一数值来源。组件 CSS 通过 var(--token) 引用，
+ *       禁止在组件中硬编码颜色/间距/时长等数值。
+ *
+ * 加载顺序：必须先于 style.css 加载，让现有 style.css 的 :root 覆盖
+ *           本文件中的同名 token，从而在阶段 0 保持视觉不变。
+ *           后续阶段会逐步替换 style.css 中的硬编码为这里的 token 引用。
+ * ========================================================================== */
+
+:root {
+  /* ──────────────────────────────────────────────────────────────────────
+   * 一、基底色（Surface）
+   * ────────────────────────────────────────────────────────────────────── */
+  --surface-felt-main:        #1A1D22;                  /* 桌面主色 */
+  --surface-felt-stage:       #20242A;                  /* 桌面中央出牌舞台（比主色亮 8%）*/
+  --surface-felt-edge:        #0C0E11;                  /* 桌面边缘渐变终点（径向渐变压暗）*/
+  --surface-card:             #F6F1E4;                  /* 卡牌底色（轻微暖白，非纯白）*/
+  --surface-panel:            rgba(20, 22, 27, 0.88);   /* HUD 面板/弹窗背景 */
+  --surface-panel-border:     rgba(198, 161, 91, 0.18);/* 面板边框描边 */
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * 二、阵营色（Faction）⭐ 解决 P2 阵营感知问题
+   * ────────────────────────────────────────────────────────────────────── */
+  /* 我方 / 队友（暖琥珀系）*/
+  --faction-ally-primary:     #C6A15B;                  /* 队友头像边框（激活）、回合指示器 */
+  --faction-ally-highlight:   #E8DCC2;                  /* 激活光晕外圈、悬停高亮 */
+  --faction-ally-muted:       #8A7F50;                  /* 非激活态队友标识 */
+  --faction-ally-glow:        rgba(198, 161, 91, 0.45); /* 回合指示光晕扩散色 */
+
+  /* 对手（冷钢蓝系）*/
+  --faction-opp-primary:      #4E8C7A;                  /* 对手头像边框（激活）*/
+  --faction-opp-highlight:    #5FA890;                  /* 对手回合激活光晕 */
+  --faction-opp-muted:        #355F52;                  /* 非激活态对手标识 */
+  --faction-opp-glow:         rgba(78, 140, 122, 0.40); /* 对手回合光晕扩散色 */
+
+  /* 中立 / 系统 */
+  --faction-neutral-primary:  #7A9BAE;                  /* 系统消息、发牌提示 */
+  --faction-neutral-muted:    #4A6070;                  /* 弱化系统信息 */
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * 三、语义色（Semantic）
+   * ────────────────────────────────────────────────────────────────────── */
+  --semantic-primary:         #B3392C;                  /* 主 CTA（出牌按钮）填充色 */
+  --semantic-primary-hover:   #D24A3B;                  /* 主 CTA 悬停态 */
+  --semantic-primary-pressed: #8F291F;                  /* 主 CTA 按下态 */
+
+  --semantic-secondary:       #3D6B8A;                  /* 次要操作（不出）填充色 */
+  --semantic-secondary-hover: #587E90;                  /* 次要操作悬停态 */
+
+  --semantic-tertiary:        rgba(255, 255, 255, 0.08);/* 辅助按钮（提示、理牌）填充 */
+  --semantic-tertiary-border: rgba(255, 255, 255, 0.18);/* 辅助按钮描边 */
+
+  --semantic-warning:         #B3392C;                  /* 炸弹提示、紧急提醒 */
+  --semantic-success:         #4E8C7A;                  /* 出牌成功、升级提示 */
+  --semantic-info:            #7A9BAE;                  /* 一般系统信息 */
+  --semantic-danger:          #C0392B;                  /* 即将超时、对手炸弹警告 */
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * 四、花色色（Suit）—— 经过补色振动调整
+   * ────────────────────────────────────────────────────────────────────── */
+  --suit-red:                 #E02828;                  /* ♥♦ 在桌面绿底上 */
+  --suit-black:               #1C1C2E;                  /* ♠♣ 在桌面绿底上 */
+  --suit-red-on-card:         #CC2222;                  /* ♥♦ 在卡牌白底上（略深一档）*/
+  --suit-black-on-card:       #1C1C2E;                  /* ♠♣ 在卡牌白底上 */
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * 五、文字色（Text）
+   *    注：style.css 中已存在同名 --text-primary / --text-secondary / --text-muted，
+   *        在阶段 0 由 style.css 覆盖以保持现状；后续阶段会逐步切换到本数值。
+   * ────────────────────────────────────────────────────────────────────── */
+  --text-primary:             #E9E0CF;                  /* 面板上的主要文字 */
+  --text-secondary:           #CDBFA6;                  /* 次要信息（玩家名、状态）*/
+  --text-muted:               #9A8F78;                  /* 弱化文字（系统提示、历史）*/
+  --text-inverse:             #1A2E1E;                  /* 浅色背景上的深色文字 */
+  --text-on-primary-btn:      #FBEEDE;                  /* 金色按钮上的文字（深色）*/
+  --text-on-secondary-btn:    #EEF2EE;                  /* 蓝色按钮上的文字 */
+  --text-on-tertiary-btn:     rgba(255, 255, 255, 0.75);/* 透明按钮上的文字 */
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * 六、间距系统（Spacing）—— 8px 基准等比
+   * ────────────────────────────────────────────────────────────────────── */
+  --space-xs:                 4px;                      /* 图标-文字、徽章内 */
+  --space-sm:                 8px;                      /* 卡牌内缩、行内元素 */
+  --space-md:                 16px;                     /* 按钮水平内边距、卡牌错位量 */
+  --space-lg:                 24px;                     /* 玩家位卡内 padding、HUD 内分区 */
+  --space-xl:                 32px;                     /* 操作区与手牌区分隔 */
+  --space-2xl:                48px;                     /* 屏幕边距、舞台到位卡的最小距离 */
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * 七、字号系统（Typography）
+   *    每档：font-size / font-weight / line-height / letter-spacing
+   *    实现注：CSS 自定义属性不能直接打包多个 font 子属性，故拆为独立 token。
+   * ────────────────────────────────────────────────────────────────────── */
+  /* 卡牌角标点数 */
+  --type-card-rank-size:      18px;
+  --type-card-rank-weight:    700;
+  --type-card-rank-lh:        1.0;
+  --type-card-rank-ls:        -0.5px;
+
+  /* 卡牌中央大数字（焦点态）*/
+  --type-card-rank-center-size:   28px;
+  --type-card-rank-center-weight: 800;
+  --type-card-rank-center-lh:     1.0;
+  --type-card-rank-center-ls:     -1px;
+
+  /* 卡牌花色符号 */
+  --type-card-suit-size:      12px;
+  --type-card-suit-weight:    400;
+  --type-card-suit-lh:        1.0;
+  --type-card-suit-ls:        0;
+
+  /* 玩家昵称 */
+  --type-player-name-size:    13px;
+  --type-player-name-weight:  500;
+  --type-player-name-lh:      1.4;
+  --type-player-name-ls:      0.2px;
+
+  /* 计数徽章 */
+  --type-badge-size:          11px;
+  --type-badge-weight:        700;
+  --type-badge-lh:            1.0;
+  --type-badge-ls:            0;
+
+  /* 主 CTA 按钮文字（出牌）*/
+  --type-btn-primary-size:    15px;
+  --type-btn-primary-weight:  700;
+  --type-btn-primary-lh:      1.0;
+  --type-btn-primary-ls:      0.5px;
+
+  /* 次要按钮文字（不出）*/
+  --type-btn-secondary-size:  14px;
+  --type-btn-secondary-weight:600;
+  --type-btn-secondary-lh:    1.0;
+  --type-btn-secondary-ls:    0.3px;
+
+  /* 辅助按钮文字（提示、理牌）*/
+  --type-btn-tertiary-size:   13px;
+  --type-btn-tertiary-weight: 400;
+  --type-btn-tertiary-lh:     1.0;
+  --type-btn-tertiary-ls:     0;
+
+  /* HUD 顶栏标签 */
+  --type-hud-label-size:      11px;
+  --type-hud-label-weight:    500;
+  --type-hud-label-lh:        1.2;
+  --type-hud-label-ls:        0.8px;
+
+  /* HUD 顶栏数值 */
+  --type-hud-value-size:      14px;
+  --type-hud-value-weight:    700;
+  --type-hud-value-lh:        1.2;
+  --type-hud-value-ls:        0;
+
+  /* 弱提示信息 */
+  --type-hint-size:           11px;
+  --type-hint-weight:         400;
+  --type-hint-lh:             1.5;
+  --type-hint-ls:             0;
+
+  /* 系统状态消息 */
+  --type-system-msg-size:     13px;
+  --type-system-msg-weight:   400;
+  --type-system-msg-lh:       1.5;
+  --type-system-msg-ls:       0;
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * 八、圆角（Border Radius）
+   * ────────────────────────────────────────────────────────────────────── */
+  --radius-card:              6px;                      /* 卡牌 */
+  --radius-btn-primary:       10px;                     /* 主 CTA 按钮 */
+  --radius-btn-secondary:     8px;                      /* 次要按钮 */
+  --radius-btn-tertiary:      6px;                      /* 辅助按钮 */
+  --radius-avatar:            50%;                      /* 头像（圆形）*/
+  --radius-badge:             100px;                    /* 计数徽章（pill）*/
+  --radius-panel:             12px;                     /* HUD 面板、弹窗 */
+  --radius-stage-hint:        8px;                      /* 中央舞台提示框 */
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * 九、阴影（Box Shadow）—— 光源在 12 点钟方向
+   * ────────────────────────────────────────────────────────────────────── */
+  /* 卡牌三态 */
+  --shadow-card-rest:         0 2px 4px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.20);
+  --shadow-card-hover:        0 8px 16px rgba(0,0,0,0.45), 0 3px 6px rgba(0,0,0,0.25);
+  --shadow-card-selected:     0 12px 22px rgba(0,0,0,0.50), 0 0 0 2px #C6A15B, 0 0 14px rgba(198,161,91,0.45);
+
+  /* 按钮三态 */
+  --shadow-btn-rest:          0 2px 8px rgba(0,0,0,0.30), 0 1px 2px rgba(0,0,0,0.15);
+  --shadow-btn-hover:         0 5px 14px rgba(0,0,0,0.40), 0 2px 4px rgba(0,0,0,0.20);
+  --shadow-btn-pressed:       0 1px 3px rgba(0,0,0,0.25);
+
+  /* 头像 / 位卡回合光晕 */
+  --shadow-avatar-ally-active: 0 0 0 3px #C6A15B, 0 0 18px rgba(198,161,91,0.55);
+  --shadow-avatar-opp-active:  0 0 0 3px #4E8C7A, 0 0 18px rgba(78,140,122,0.55);
+  --shadow-avatar-idle:        0 1px 4px rgba(0,0,0,0.40);
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * 十、动效系统（Motion）
+   * ────────────────────────────────────────────────────────────────────── */
+  /* 缓动曲线 */
+  --ease-out-enter:           cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 元素入场 */
+  --ease-in-out-state:        cubic-bezier(0.45, 0.05, 0.55, 0.95); /* 状态切换 */
+  --spring-feedback:          cubic-bezier(0.34, 1.56, 0.64, 1);    /* 交互反馈（带超出回弹）*/
+
+  /* 时长档位 */
+  --duration-fast:            150ms;                    /* 悬停反馈 */
+  --duration-normal:          250ms;                    /* 选中、状态切换 */
+  --duration-slow:            400ms;                    /* 卡牌飞行、回合切换 */
+  --duration-linger:          2500ms;                   /* 出牌记录在桌面停留时长 */
+  --duration-pulse-period:    1200ms;                   /* 回合指示光晕脉冲周期 */
+}

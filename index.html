@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>掼蛋 — 在线对战</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="description" content="掼蛋在线对战游戏，4人实时联网对战">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <!-- 设计 Token 基础设施（必须先于 style.css，让现有 :root 覆盖同名 token，保持视觉不变）-->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- ====== 返回主站（阶段 1：改造为汉堡菜单图标按钮，跳转目标不变）====== -->
+  <a href="../../products.html" class="back-to-products" aria-label="返回主站">≡</a>
+
+  <!-- ====== 首页/大厅 ====== -->
+  <div id="lobby-screen" class="screen active">
+    <div class="lobby-scroll-wrap">
+      <div class="lobby-container">
+        <div class="logo-area">
+          <div class="logo-icon">🀄</div>
+          <h1 class="logo-title">掼 蛋</h1>
+          <p class="logo-subtitle">单机版 · 含强 AI 对手</p>
+        </div>
+
+        <div class="login-section">
+          <input type="text" id="nickname-input" placeholder="输入你的昵称" maxlength="8" class="input-field">
+        </div>
+
+        <!-- 模式选择 -->
+        <div class="mode-selector" style="display:none;"><!-- v2.0.1 产品决策：多人联机冻结，入口下线（代码保留） -->
+          <button id="solo-mode-btn" class="mode-btn active">
+            <span class="mode-icon">🎮</span>
+            <span class="mode-label">单人游戏</span>
+            <span class="mode-desc">与 AI 对战</span>
+          </button>
+          <button id="multi-mode-btn" class="mode-btn">
+            <span class="mode-icon">🌐</span>
+            <span class="mode-label">多人在线</span>
+            <span class="mode-desc">邀请好友</span>
+          </button>
+        </div>
+
+        <!-- ── 单人模式配置面板 ── -->
+        <div id="solo-panel" class="mode-panel">
+          <!-- v1.3 本地战绩 + 段位 -->
+          <div id="player-stats" class="player-stats" style="display:none;">
+            <span id="stats-rank" class="stats-rank">🥉 青铜</span>
+            <span id="stats-record" class="stats-record"></span>
+          </div>
+          <div class="config-heading">配置对手</div>
+          <div class="npc-config-list">
+
+            <!-- 队友 seat=2（同队） -->
+            <div class="npc-config-slot" data-seat="2">
+              <div class="slot-header">
+                <span class="slot-role slot-team-a">🤝 队友</span>
+                <span class="slot-profile-name" id="slot-name-2">进阶</span>
+              </div>
+              <div class="profile-tabs" data-seat="2">
+                <button class="profile-tab" data-profile="newbie">🐣<br><span>新手</span></button>
+                <button class="profile-tab" data-profile="casual">🎲<br><span>休闲</span></button>
+                <button class="profile-tab active" data-profile="advanced">🎯<br><span>进阶</span></button>
+                <button class="profile-tab" data-profile="pro">🧠<br><span>高手</span></button>
+                <button class="profile-tab" data-profile="master">👑<br><span>大师</span></button>
+              </div>
+              <div class="slot-desc" id="slot-desc-2">很少失误，要动脑</div>
+            </div>
+
+            <!-- 对手一 seat=1 -->
+            <div class="npc-config-slot" data-seat="1">
+              <div class="slot-header">
+                <span class="slot-role slot-team-b">⚔️ 对手一</span>
+                <span class="slot-profile-name" id="slot-name-1">进阶</span>
+              </div>
+              <div class="profile-tabs" data-seat="1">
+                <button class="profile-tab" data-profile="newbie">🐣<br><span>新手</span></button>
+                <button class="profile-tab" data-profile="casual">🎲<br><span>休闲</span></button>
+                <button class="profile-tab active" data-profile="advanced">🎯<br><span>进阶</span></button>
+                <button class="profile-tab" data-profile="pro">🧠<br><span>高手</span></button>
+                <button class="profile-tab" data-profile="master">👑<br><span>大师</span></button>
+              </div>
+              <div class="slot-desc" id="slot-desc-1">很少失误，要动脑</div>
+            </div>
+
+            <!-- 对手二 seat=3 -->
+            <div class="npc-config-slot" data-seat="3">
+              <div class="slot-header">
+                <span class="slot-role slot-team-b">⚔️ 对手二</span>
+                <span class="slot-profile-name" id="slot-name-3">进阶</span>
+              </div>
+              <div class="profile-tabs" data-seat="3">
+                <button class="profile-tab" data-profile="newbie">🐣<br><span>新手</span></button>
+                <button class="profile-tab" data-profile="casual">🎲<br><span>休闲</span></button>
+                <button class="profile-tab active" data-profile="advanced">🎯<br><span>进阶</span></button>
+                <button class="profile-tab" data-profile="pro">🧠<br><span>高手</span></button>
+                <button class="profile-tab" data-profile="master">👑<br><span>大师</span></button>
+              </div>
+              <div class="slot-desc" id="slot-desc-3">很少失误，要动脑</div>
+            </div>
+          </div>
+
+          <button id="solo-start-btn" class="btn btn-primary" style="width:100%; margin-top:16px;">
+            <span class="btn-icon">🚀</span> 开始对战
+          </button>
+          <!-- v1.1 断局恢复：有存档时显示 -->
+          <button id="resume-game-btn" class="btn btn-secondary" style="width:100%; margin-top:10px; display:none;">
+            <span class="btn-icon">⏯</span> 继续上一局
+          </button>
+        </div>
+
+        <!-- ── 多人在线面板 ── -->
+        <div id="multi-panel" class="mode-panel" style="display:none">
+          <div class="lobby-actions">
+            <button id="create-room-btn" class="btn btn-primary">
+              <span class="btn-icon">🏠</span>
+              创建房间
+            </button>
+            <div class="join-room-group">
+              <input type="text" id="room-id-input" placeholder="输入房间号" maxlength="8" class="input-field input-room">
+              <button id="join-room-btn" class="btn btn-secondary">
+                <span class="btn-icon">🚪</span>
+                加入
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="lobby-status" class="status-text"></div>
+      </div>
+
+      <div class="tutorial-section" style="display:none;"><!-- v2.0.1 产品决策：教程系统已取消，入口下线（代码保留） -->
+        <h3 class="tutorial-heading">📚 新手教学</h3>
+        <div class="tutorial-lessons" id="tutorial-lessons">
+          <button class="btn btn-tutorial" data-lesson="01">第1课：认识牌</button>
+          <button class="btn btn-tutorial" data-lesson="02">第2课：牌型详解</button>
+          <button class="btn btn-tutorial" data-lesson="03">第3课：炸弹</button>
+          <button class="btn btn-tutorial" data-lesson="04">第4课：进贡与升级</button>
+          <button class="btn btn-tutorial" data-lesson="05">第5课：完整对局</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== 房间等待页 ====== -->
+  <div id="room-screen" class="screen">
+    <div class="room-container">
+      <div class="room-header">
+        <h2>房间号: <span id="room-id-display" class="room-id-highlight"></span></h2>
+        <button id="copy-room-id-btn" class="btn btn-small">📋 复制</button>
+      </div>
+
+      <div class="seats-grid">
+        <div class="seat-card" id="seat-0">
+          <div class="seat-avatar">👤</div>
+          <div class="seat-name">等待加入...</div>
+          <div class="seat-status"></div>
+        </div>
+        <div class="seat-card" id="seat-1">
+          <div class="seat-avatar">👤</div>
+          <div class="seat-name">等待加入...</div>
+          <div class="seat-status"></div>
+        </div>
+        <div class="seat-card" id="seat-2">
+          <div class="seat-avatar">👤</div>
+          <div class="seat-name">等待加入...</div>
+          <div class="seat-status"></div>
+        </div>
+        <div class="seat-card" id="seat-3">
+          <div class="seat-avatar">👤</div>
+          <div class="seat-name">等待加入...</div>
+          <div class="seat-status"></div>
+        </div>
+      </div>
+
+      <div class="team-labels">
+        <span class="team-label team1">🔴 队伍A: 座位1 & 座位3</span>
+        <span class="team-label team2">🔵 队伍B: 座位2 & 座位4</span>
+      </div>
+
+      <div class="room-actions">
+        <button id="ready-btn" class="btn btn-primary">✋ 准备</button>
+        <button id="start-game-btn" class="btn btn-accent" style="display:none;">🚀 开始游戏</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== 游戏主界面 ====== -->
+  <div id="game-screen" class="screen">
+    <!-- 顶部信息栏 -->
+    <div class="game-info-bar">
+      <div class="level-display">
+        <span class="team-level" id="team1-level">🔴 2</span>
+        <span class="vs-text">VS</span>
+        <span class="team-level" id="team2-level">🔵 2</span>
+      </div>
+      <div class="current-level-badge" id="current-level-badge">级牌: 2</div>
+      <div class="round-badge" id="round-badge">第1局</div>
+      <!-- v1.2 音效总开关 -->
+      <button id="sound-toggle-btn" class="sound-toggle" title="音效开关">🔊</button>
+      <!-- v1.3 记牌器开关 -->
+      <button id="counter-toggle-btn" class="sound-toggle" title="记牌器">📊</button>
+    </div>
+
+    <!-- v1.3 记牌器面板：显示"别人手里 + 牌堆"还剩几张 -->
+    <div id="card-counter" class="card-counter" style="display:none;">
+      <div class="card-counter-title">记牌器 <span class="card-counter-hint">(其他三家剩余)</span></div>
+      <div class="card-counter-grid" id="card-counter-grid"></div>
+    </div>
+
+    <!-- 对家（上方） -->
+    <div class="player-area player-top" id="player-top">
+      <div class="player-info">
+        <div class="player-avatar">友</div>
+        <span class="player-name" id="player-top-name">对家</span>
+        <span class="thinking-dots" aria-hidden="true"><span class="thinking-dot">·</span><span class="thinking-dot">·</span><span class="thinking-dot">·</span></span>
+        <span class="card-count" id="player-top-count">27</span>
+      </div>
+      <!-- P1.2 任务：?debug=1 模式下显示该 NPC 决策 trace 的信息泡 -->
+      <div class="npc-trace-bubble" id="npc-trace-top"></div>
+      <div class="played-cards-area" id="played-top"></div>
+    </div>
+
+    <!-- 左侧玩家 -->
+    <div class="player-area player-left" id="player-left">
+      <div class="player-info">
+        <div class="player-avatar">西</div>
+        <span class="player-name" id="player-left-name">左手</span>
+        <span class="thinking-dots" aria-hidden="true"><span class="thinking-dot">·</span><span class="thinking-dot">·</span><span class="thinking-dot">·</span></span>
+        <span class="card-count" id="player-left-count">27</span>
+      </div>
+      <div class="npc-trace-bubble" id="npc-trace-left"></div>
+      <div class="played-cards-area" id="played-left"></div>
+    </div>
+
+    <!-- 右侧玩家 -->
+    <div class="player-area player-right" id="player-right">
+      <div class="player-info">
+        <div class="player-avatar">东</div>
+        <span class="player-name" id="player-right-name">右手</span>
+        <span class="thinking-dots" aria-hidden="true"><span class="thinking-dot">·</span><span class="thinking-dot">·</span><span class="thinking-dot">·</span></span>
+        <span class="card-count" id="player-right-count">27</span>
+      </div>
+      <div class="npc-trace-bubble" id="npc-trace-right"></div>
+      <div class="played-cards-area" id="played-right"></div>
+    </div>
+
+    <!-- 中央出牌区 -->
+    <div class="center-play-area" id="center-play-area">
+      <!-- 阶段 2 新增：常驻舞台视觉锚 -->
+      <!-- 阶段 3 任务 3.2 新增：4 个 quadrant 容器，每家出的牌飞入对应象限 -->
+      <div class="stage-anchor" id="stage-anchor">
+        <span class="stage-anchor-label">等待出牌</span>
+        <div class="stage-quadrant" id="stage-bottom"></div>
+        <div class="stage-quadrant" id="stage-top"></div>
+        <div class="stage-quadrant" id="stage-left"></div>
+        <div class="stage-quadrant" id="stage-right"></div>
+      </div>
+      <div class="play-info" id="play-info"></div>
+    </div>
+
+    <!-- 底部（自己） -->
+    <div class="player-area player-bottom">
+      <div class="action-buttons" id="action-buttons">
+        <button id="sort-btn" class="btn btn-small btn-sort">🀄 理牌</button>
+        <button id="hint-btn" class="btn btn-small btn-hint">💡 提示</button>
+        <!-- v1.3 托管 -->
+        <button id="auto-btn" class="btn btn-small btn-auto">🤖 托管</button>
+        <button id="pass-btn" class="btn btn-small btn-pass">⏭ 不出</button>
+        <button id="play-btn" class="btn btn-small btn-play">🃏 出牌</button>
+      </div>
+      <!-- v1.3 出牌读秒 -->
+      <div id="turn-timer" class="turn-timer" style="display:none;"></div>
+      <div id="npc-explain-bubble" class="npc-explain-bubble" style="display:none;"></div>
+      <div id="bomb-effect" class="bomb-effect"></div>
+      <div class="hand-area" id="hand-area">
+        <!-- 手牌将动态渲染 -->
+      </div>
+    </div>
+
+    <!-- 状态消息 -->
+    <div class="game-message" id="game-message"></div>
+  </div>
+
+  <!-- ====== 结算弹窗 ====== -->
+  <div id="result-overlay" class="overlay" style="display:none;">
+    <div class="result-card">
+      <h2 id="result-title">本局结束</h2>
+      <div id="result-desc" class="result-desc"></div>
+      <div id="result-ranks" class="result-rank-list"></div>
+      <div id="result-levels" class="result-level-row"></div>
+      <div id="result-bombs" class="result-bombs"></div>
+      <button id="next-round-btn" class="btn btn-primary" style="margin-top:18px;">继续下一局</button>
+      <button id="replay-btn-round" class="btn btn-small" style="margin-top:10px;">📋 复盘本局</button>
+    </div>
+  </div>
+
+  <!-- ====== 进贡弹窗 ====== -->
+  <div id="tribute-overlay" class="overlay" style="display:none;">
+    <div class="result-card">
+      <h2 id="tribute-title">进贡阶段</h2>
+      <p id="tribute-desc"></p>
+      <div id="tribute-received" class="tribute-received" style="display:none;">
+        <span>收到进贡：</span>
+        <div id="tribute-received-cards" class="tribute-received-cards"></div>
+      </div>
+      <div id="tribute-hand" class="tribute-hand"></div>
+      <p class="tribute-hint" id="tribute-hint-text"></p>
+    </div>
+  </div>
+
+  <!-- ====== 游戏结束弹窗 ====== -->
+  <div id="gameover-overlay" class="overlay" style="display:none;">
+    <div class="result-card gameover-card">
+      <div class="gameover-icon">🏆</div>
+      <h2 id="gameover-title">游戏结束</h2>
+      <div id="gameover-details" class="result-details"></div>
+      <button id="back-to-lobby-btn" class="btn btn-primary">返回大厅</button>
+      <button id="replay-btn-final" class="btn btn-small" style="margin-top:10px;">📋 全场复盘</button>
+    </div>
+  </div>
+
+  <!-- ====== 教学覆盖层 ====== -->
+  <div id="tutorial-overlay" class="tutorial-overlay" style="display:none;">
+    <div class="tutorial-bubble" id="tutorial-bubble">
+      <div class="tutorial-progress" id="tutorial-progress">第1课 · 步骤 1/3</div>
+      <div class="tutorial-prompt" id="tutorial-prompt"></div>
+      <button class="btn btn-small btn-tutorial-next" id="tutorial-next-btn" style="display:none;">继续 →</button>
+    </div>
+    <div class="tutorial-highlight-mask" id="tutorial-mask"></div>
+  </div>
+
+  <!-- ====== v2.4 复盘面板 ====== -->
+  <div id="replay-overlay" class="overlay" style="display:none;">
+    <div class="replay-card">
+      <div class="replay-header">
+        <h2>📋 对局复盘</h2>
+        <div class="replay-round-tabs" id="replay-round-tabs"></div>
+        <button id="replay-close-btn" class="btn btn-small">✕ 关闭</button>
+      </div>
+      <div class="replay-hint">点击任意一手展开当时四家手牌 · 点 🚩 标记打得不合理的手 · 导出后发给开发者修正</div>
+      <div id="replay-list" class="replay-list"></div>
+      <div class="replay-footer">
+        <span id="replay-flag-count">已标记 0 手</span>
+        <button id="replay-export-btn" class="btn btn-primary btn-small">📤 导出标记</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 静态托管下用 ES Module loopback；其他环境用普通 WebSocket -->
+  <script>
+    window.__GUANDAN_STATIC_HOST__ =
+      window.__GUANDAN_STATIC_HOST_OVERRIDE__ === true ||
+      location.hostname.endsWith('github.io') ||
+      location.hostname.endsWith('githubpages.io') ||
+      location.search.includes('demo=1') ||
+      location.protocol === 'file:';
+    if (!window.__GUANDAN_STATIC_HOST__) {
+      // 真服务器模式
+      const s = document.createElement('script');
+      s.src = 'js/network/websocket.js';
+      document.currentScript.after(s);
+    }
+  </script>
+  <!-- 静态模式专用 loopback（ES module）-->
+  <script type="module">
+    if (window.__GUANDAN_STATIC_HOST__) {
+      await import('./js/network/loopback.js');
+      window.dispatchEvent(new Event('gameSocketReady'));
+    }
+  </script>
+
+  <script src="js/ui/cardRenderer.js"></script>
+  <script src="js/ui/soundManager.js"></script>
+  <script src="js/ui/gameUI.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // v1.5 PWA：所有环境统一注册 Service Worker（network-first，离线可玩单机模式）
+    // 旧"静态模式自毁 SW"逻辑已完成历史使命（v1.5 前的部署遗留已清干净），移除
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

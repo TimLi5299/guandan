@@ -1,0 +1,29 @@
+{
+  "id": "01",
+  "title": "认识牌：两副牌与基础概念",
+  "type": "lecture",
+  "currentLevel": 2,
+  "sandboxConfig": { "mode": "random", "cardsPerPlayer": 5 },
+  "steps": [
+    {
+      "stepId": 1,
+      "prompt": "欢迎来到掼蛋！掼蛋用两副标准扑克牌（共108张），4人两两组队对战。点击'继续'开始学习。",
+      "expectedAction": "NEXT",
+      "highlightArea": "none"
+    },
+    {
+      "stepId": 2,
+      "prompt": "牌的大小：从小到大是 2 < 3 < 4 ... < A < 级牌 < 小王 < 大王。现在打2，所以所有2是级牌，比A还大！",
+      "expectedAction": "NEXT",
+      "highlightArea": "current-level"
+    },
+    {
+      "stepId": 3,
+      "prompt": "特别牌型：红桃2是'万能牌'（也叫百搭），可以当任何普通牌用！现在你手里有5张牌，随便出一张单牌试试看。",
+      "expectedAction": "PLAY_SINGLE",
+      "highlightArea": "hand",
+      "onCorrect": { "message": "出牌成功！你已经学会最基本的操作了。" },
+      "onWrong": { "hint": "请点击一张牌选中它，然后点'出牌'按钮" }
+    }
+  ]
+}

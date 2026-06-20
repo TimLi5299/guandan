@@ -1,0 +1,2419 @@
+/* ====== 掼蛋游戏样式 (Tencent Guandan Style) ====== */
+
+:root {
+  /* 国风·精炼主题：深炭灰雅底 + 暖金 + 朱砂 + 冷玉 + 暖米 */
+  --bg-table-center: #20242a;   /* 中央雅底亮 */
+  --bg-table-edge:   #15171c;   /* 雅底中 */
+  --bg-table-dark:   #0c0e11;   /* 雅底暗（暗角）*/
+  --bg-panel: rgba(20, 22, 27, 0.86);        /* 深灰面板 */
+  --bg-glass: rgba(198, 161, 91, 0.08);      /* 暖金微光玻璃 */
+  --text-primary: #E9E0CF;      /* 暖米白 */
+  --text-secondary: #cdbfa6;
+  --text-muted: #9a8f78;
+  --accent-gold: #C6A15B;       /* 暖金（我方/强调）*/
+  --accent-gold-lit: #e8dcc2;   /* 暖金亮（高光/标题）*/
+  --accent-gold-dark: #9a7f48;
+  --accent-blue: #4E8C7A;       /* 冷玉绿（对手阵营）*/
+  --accent-green: #4E8C7A;
+  --accent-red: #b3392c;        /* 朱砂（级牌印章 / CTA）*/
+  --accent-ember: #d24a3b;      /* 朱砂亮（CTA 渐变上端）*/
+  --accent-ember-dark: #8f291f;
+  --card-white: #F6F1E4;        /* 暖米牌面 */
+  --card-border: rgba(0, 0, 0, 0.14);
+  --card-shadow: rgba(0, 0, 0, 0.45);
+  --border-subtle: rgba(198, 161, 91, 0.18);  /* 暖金描边 */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --font-sans: "Noto Serif SC", "Songti SC", serif;        /* 国风正文用衬线 */
+  --font-serif: "Noto Serif SC", "Songti SC", "STSong", serif;
+  --font-display: "Ma Shan Zheng", "Noto Serif SC", serif; /* 毛笔楷书（品牌/级牌/头像）*/
+  --font-num: "Fraunces", "Noto Serif SC", serif;          /* 衬线数字（牌面/局况）*/
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  /* 国风·精炼：深炭灰雅底径向渐变 + 宣纸纹理 + 四周暗角 */
+  background:
+    radial-gradient(120% 80% at 50% 34%, var(--bg-table-center) 0%, var(--bg-table-edge) 46%, var(--bg-table-dark) 100%);
+  color: var(--text-primary);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  /* iOS Safe Area Support */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* 国风：宣纸纹理 overlay + 暗角 vignette */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px);
+  mix-blend-mode:overlay;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  box-shadow:inset 0 0 240px rgba(0,0,0,.55);
+}
+
+/* ====== Screens ====== */
+.screen {
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.screen.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 大厅页面：垂直方向可滚动 */
+#lobby-screen.active {
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
+.lobby-scroll-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 16px;
+  min-height: 100%;
+  gap: 20px;
+  width: 100%;
+}
+
+/* ====== 通用组件 ====== */
+.btn {
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: bold;
+  font-size: 16px;
+  padding: 14px 32px;
+  border-radius: var(--radius-lg);
+  transition: transform 0.1s, filter 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.btn:active { transform: scale(0.92); }
+.btn:hover { filter: brightness(1.1); }
+
+/* 模仿腾讯游戏的高光立体按钮 */
+.btn-primary {
+  background: linear-gradient(180deg, #ffd32a 0%, #ffa502 100%);
+  color: #5e3b00;
+  box-shadow: 0 4px 0 #cc8e00, 0 8px 15px rgba(255,165,2,0.4), inset 0 2px 5px rgba(255,255,255,0.6);
+  border: 1px solid #ffd32a;
+}
+.btn-primary:active {
+  box-shadow: 0 0 0 #cc8e00, inset 0 2px 5px rgba(0,0,0,0.2);
+  transform: translateY(4px) scale(0.98);
+}
+
+.btn-secondary {
+  background: linear-gradient(180deg, #1e90ff 0%, #0984e3 100%);
+  color: #fff;
+  box-shadow: 0 4px 0 #076aba, 0 8px 15px rgba(9,132,227,0.4), inset 0 2px 5px rgba(255,255,255,0.4);
+  border: 1px solid #74b9ff;
+}
+.btn-secondary:active {
+  box-shadow: 0 0 0 #076aba, inset 0 2px 5px rgba(0,0,0,0.2);
+  transform: translateY(4px) scale(0.98);
+}
+
+.btn-accent {
+  background: linear-gradient(180deg, #ff4757 0%, #ff6b81 100%);
+  color: #fff;
+  box-shadow: 0 4px 0 #c0392b, 0 8px 15px rgba(255,71,87,0.4);
+}
+
+.btn-small {
+  padding: 8px 20px;
+  font-size: 14px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+}
+.btn-small:active {
+  box-shadow: none;
+  transform: translateY(3px);
+}
+
+.btn-tiny {
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+  min-width: 44px;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+}
+.btn-tiny:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.btn-danger {
+  background: linear-gradient(180deg, #ff4757 0%, #ff6b81 100%);
+  color: #fff;
+  box-shadow: 0 3px 0 #c0392b, 0 6px 10px rgba(255,71,87,0.3);
+}
+.btn-danger:active {
+  box-shadow: 0 0 0 #c0392b;
+  transform: translateY(3px);
+}
+
+.btn-sort { background: linear-gradient(180deg, #f9ca24, #f0932b); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.btn-hint { background: linear-gradient(180deg, #00d2d3, #0abde3); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.btn-pass { background: linear-gradient(180deg, #a4b0be, #747d8c); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.btn-play { background: linear-gradient(180deg, #1dd1a1, #10ac84); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+
+.input-field {
+  background: rgba(0,0,0,0.25);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  font-size: 16px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  outline: none;
+  width: 100%;
+  transition: all 0.2s;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+.input-field:focus {
+  border-color: var(--accent-gold);
+  background: rgba(0,0,0,0.4);
+}
+.input-field::placeholder { color: var(--text-muted); }
+
+/* ====== 大厅 ====== */
+.lobby-container {
+  text-align: center;
+  padding: 40px;
+  background: var(--bg-panel);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  backdrop-filter: blur(15px);
+  max-width: 420px;
+  width: 90%;
+}
+
+.logo-area { margin-bottom: 30px; }
+.logo-icon {
+  font-size: 52px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6));
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.logo-title {
+  display: inline-block;
+  font-family: var(--font-display);   /* 毛笔楷书 */
+  font-size: 92px;
+  font-weight: 400;
+  letter-spacing: 10px;
+  padding-left: 10px;
+  color: var(--accent-gold-lit);
+  position: relative;
+  text-shadow: 0 3px 14px rgba(0,0,0,0.7), 0 1px 0 rgba(198,161,91,.3);
+}
+
+.logo-subtitle {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-top: 14px;
+  letter-spacing: 5px;
+  padding-left: 5px;
+  font-weight: 500;
+}
+
+.login-section { margin-bottom: 30px; }
+
+.lobby-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.join-room-group {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+.input-room { flex: 1; text-align: center; font-family: monospace; letter-spacing: 2px; font-size: 18px; }
+
+.status-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--accent-gold);
+  font-weight: bold;
+}
+
+/* ====== 房间等待页 ====== */
+.room-container {
+  background: var(--bg-panel);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  padding: 30px;
+  max-width: 540px;
+  width: 95%;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.room-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.room-id-highlight {
+  font-family: monospace;
+  font-size: 32px;
+  color: #ffeaa7;
+  letter-spacing: 6px;
+  background: rgba(0,0,0,0.3);
+  padding: 8px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,234,167,0.3);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.seats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.seat-card {
+  background: rgba(0,0,0,0.2);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  padding: 24px 16px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.seat-card.occupied {
+  border-color: var(--accent-blue);
+  background: linear-gradient(180deg, rgba(30,144,255,0.1) 0%, rgba(0,0,0,0.3) 100%);
+}
+.seat-card.ready {
+  border-color: var(--accent-green);
+  background: linear-gradient(180deg, rgba(46,204,113,0.15) 0%, rgba(0,0,0,0.3) 100%);
+}
+.seat-card.me {
+  box-shadow: 0 0 20px rgba(255,165,2,0.3);
+  border-color: var(--accent-gold);
+}
+
+.seat-avatar { 
+  font-size: 48px; 
+  margin-bottom: 12px; 
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+}
+.seat-name { font-size: 16px; font-weight: bold; color: #fff; text-shadow: 0 1px 2px #000; }
+.seat-status {
+  font-size: 14px;
+  margin-top: 8px;
+  min-height: 20px;
+  font-weight: bold;
+  color: var(--accent-gold);
+}
+
+.npc-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.npc-selection .btn-group {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.team-labels {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 30px;
+  font-size: 14px;
+  font-weight: bold;
+}
+.team-label { padding: 6px 16px; border-radius: var(--radius-lg); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.team1 { background: linear-gradient(135deg, #e74c3c, #c0392b); border: 2px solid #ff7979; }
+.team2 { background: linear-gradient(135deg, #3498db, #2980b9); border: 2px solid #7ed6df; }
+
+.room-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+/* ====== 游戏界面 ====== */
+#game-screen.active {
+  display: block;
+  position: relative;
+}
+
+.game-info-bar {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  z-index: 10;
+}
+
+.team-level { font-family: var(--font-num); }
+.level-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0,0,0,0.4);
+  padding: 8px 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.15);
+  font-size: 16px;
+  font-weight: 900;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.vs-text { color: var(--accent-gold); font-size: 14px; font-style: italic; }
+
+.current-level-badge {
+  font-family: var(--font-display);   /* 毛笔楷书 */
+  background: linear-gradient(160deg, #b3392c, #8f291f);  /* 朱砂印章 */
+  border: 1px solid rgba(255,210,180,0.35);
+  padding: 3px 15px 5px;
+  border-radius: 9px;
+  font-size: 21px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  color: #fbeede;
+  box-shadow: 0 4px 13px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,225,200,0.22);
+}
+
+/* 玩家区域 */
+.player-area {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-panel);
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px solid var(--border-subtle);
+  font-size: 14px;
+  font-family: var(--font-serif);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: all 0.3s;
+}
+.player-info.active-turn {  /* 基础兜底，#player-* 阵营态会覆盖 */
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 15px var(--faction-ally-glow);
+  transform: scale(1.05);
+}
+
+.player-avatar {
+  font-family: var(--font-display);   /* 毛笔楷书 */
+  font-size: 21px;
+  color: #1a1712;
+  background: radial-gradient(circle at 35% 30%, #e8dcc2, #bfae8e);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 1px;
+}
+.player-name { font-weight: bold; text-shadow: 0 1px 2px #000; }
+.card-count {
+  background: var(--accent-gold);
+  color: #1a1712;
+  font-family: var(--font-num);
+  padding: 1px 10px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.3);
+  border: 1px solid #ff7979;
+}
+
+.player-top { top: 60px; left: 50%; transform: translateX(-50%); }
+.player-left { left: 20px; top: 40%; transform: translateY(-50%); }
+.player-right { right: 20px; top: 40%; transform: translateY(-50%); }
+.player-bottom { bottom: 0; left: 0; right: 0; padding: 0 16px 16px; z-index: 20; }
+
+/* 出牌区域 — 样式已移至 .played-card 块，这里保留 pop 动画 */
+.played-cards-area {
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.center-play-area {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.play-info {
+  font-size: 22px;
+  font-weight: 900;
+  color: #f1c40f;
+  text-shadow: 0 4px 6px rgba(0,0,0,0.8), 0 0 20px rgba(241,196,15,0.6);
+  letter-spacing: 2px;
+  opacity: 0;
+  z-index: 16;   /* review: 高于 stage-quadrant，文字移到舞台上缘避免盖牌 */
+}
+/* review-P1 修复：动画挂在 .zoom class 上由 JS 重启——原 forwards 直接钉死在 opacity:0，
+   牌型大字整局只播一次后永久不可见 */
+.play-info.zoom {
+  animation: zoomFade 2s forwards;
+}
+@keyframes zoomFade {
+  0% { transform: scale(0.5); opacity: 0; }
+  15% { transform: scale(1.2); opacity: 1; }
+  30% { transform: scale(1); opacity: 1; }
+  80% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.1); opacity: 0; }
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px 0;
+  transition: opacity 0.3s;
+}
+
+/* 手牌区 (腾讯风格: 更紧凑的展开) */
+.hand-area {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 10px;
+  overflow: visible;
+  isolation: isolate;
+}
+
+/* ====== 扑克牌样式 (更拟真) ====== */
+.card {
+  width: 70px;
+  height: 100px;
+  background: var(--card-white);
+  border-radius: 6px;
+  border: 1px solid var(--card-border);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), z-index 0s;
+  margin-left: -40px;
+  position: relative;
+  z-index: 1;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,1);
+  flex-shrink: 0;
+  padding: 4px;
+}
+.card:first-child { margin-left: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+.card.selected {
+  transform: translateY(-20px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 12px rgba(255,211,42,0.8);
+  border-color: #ffd32a;
+  z-index: 100 !important;
+}
+
+.card:hover:not(.selected) {
+  transform: translateY(-8px);
+}
+
+.card .card-rank {
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1;
+  font-family: var(--font-num);   /* Fraunces 衬线数字 */
+  letter-spacing: -0.5px;
+}
+.card .card-suit { 
+  font-size: 20px; 
+  line-height: 1; 
+  margin-top: 2px;
+}
+
+.card.red { color: #d63031; }
+.card.black { color: #2d3436; }
+.card.joker-red { 
+  background: linear-gradient(135deg, #fff0f0, #fff); 
+  color: #d63031; 
+  align-items: center; 
+  justify-content: center;
+}
+.card.joker-black { 
+  background: linear-gradient(135deg, #f0f0ff, #fff); 
+  color: #2d3436; 
+  align-items: center; 
+  justify-content: center;
+}
+.card.joker-red .card-rank, .card.joker-black .card-rank { font-size: 20px; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px; }
+.card.joker-red .card-suit, .card.joker-black .card-suit { display: none; } /* Hide suit for Jokers to make vertical text cleaner */
+
+
+/* 较小的卡牌背面 (其他玩家) */
+.card-back {
+  width: 20px;
+  height: 30px;
+  background: url("data:image/svg+xml,%3Csvg width='20' height='30' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='20' height='30' fill='%232c3e50'/%3E%3Cpath d='M0 0l10 15L20 0M0 30l10-15 10 15' stroke='%2334495e' stroke-width='2' fill='none'/%3E%3C/svg%3E") var(--accent-blue);
+  border-radius: 2px;
+  border: 1px solid #1a252f;
+  margin-left: -12px;
+  display: inline-block;
+  box-shadow: -1px 0 3px rgba(0,0,0,0.5);
+}
+.card-back:first-child { margin-left: 0; }
+
+/* 出牌区展示的卡牌（清晰可读，适度重叠） */
+.played-card {
+  width: 58px;
+  height: 82px;
+  margin-left: -12px;
+  cursor: default;
+  box-shadow: -1px 2px 6px rgba(0,0,0,0.35), inset 0 0 8px rgba(255,255,255,0.9);
+}
+.played-card:first-child { margin-left: 0; }
+.played-card:hover { transform: none; }
+
+.played-card .card-rank { font-size: 20px; }
+.played-card .card-suit { font-size: 16px; }
+
+/* 出牌区背景 — 让打出的牌更突出 */
+.played-cards-area {
+  min-height: 90px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-top: 10px;
+  padding: 6px 10px;
+  background: rgba(0,0,0,0.18);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  min-width: 80px;
+}
+
+/* ====== 弹窗 overlay (更加炫酷) ====== */
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+}
+
+.result-card {
+  background: linear-gradient(180deg, #20242a 0%, #14171c 100%);
+  border: 2px solid var(--accent-gold);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+  font-family: var(--font-serif);
+  box-shadow: 0 0 50px rgba(198,161,91,0.22), inset 0 0 22px rgba(0,0,0,0.7);
+  animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); opacity: 1; }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+.result-card h2 {
+  font-family: var(--font-display);
+  font-size: 36px;
+  color: var(--accent-gold-lit);
+  text-shadow: 0 4px 8px rgba(0,0,0,0.8);
+  margin-bottom: 20px;
+  letter-spacing: 4px;
+}
+
+.result-details {
+  margin: 20px 0 30px;
+  font-size: 16px;
+  color: var(--text-primary);
+  line-height: 2;
+  background: rgba(0,0,0,0.3);
+  padding: 15px;
+  border-radius: var(--radius-md);
+  border: 1px inset rgba(255,255,255,0.1);
+}
+
+.gameover-card { border-color: var(--accent-red); box-shadow: 0 0 50px rgba(179,57,44,0.4); }
+.gameover-card h2 { color: var(--accent-ember); }
+
+/* ====== 游戏消息（toast） ====== */
+.game-message {
+  position: fixed;
+  top: 26%;   /* review-P1: 原在屏幕正中盖住中央牌组 2 秒 */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 500;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.game-message.show {
+  opacity: 1;
+}
+
+/* ====== 响应式 ====== */
+@media (max-width: 600px) {
+  .logo-title { font-size: 40px; letter-spacing: 6px; }
+  .room-id-highlight { font-size: 24px; }
+  /* 更紧凑的手牌给移动端 */
+  .card { width: 44px; height: 64px; margin-left: -28px; padding: 2px;}
+  .card .card-rank { font-size: 16px; }
+  .card .card-suit { font-size: 14px; }
+  .card.selected { transform: translateY(-12px); }
+  .played-card { width: 46px; height: 64px; margin-left: -10px; }
+  .played-card .card-rank { font-size: 16px; }
+  .played-card .card-suit { font-size: 13px; }
+  .player-info { padding: 4px 10px; font-size: 12px; }
+  .player-top { top: 70px; }
+  .player-left { left: 5px; }
+  .player-right { right: 5px; }
+  .action-buttons { gap: 6px; }
+  .btn-small { padding: 10px 14px; font-size: 13px; } /* Compact but tappable on mobile */
+}
+
+/* ====== 炸弹动画特效 ====== */
+.bomb-effect {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,165,2,0.8) 0%, rgba(255,69,0,0.4) 50%, transparent 100%);
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.bomb-effect.animate {
+  visibility: visible;
+  animation: explode 0.8s cubic-bezier(0.1, 0.7, 1.0, 0.1) forwards;
+}
+
+@keyframes explode {
+  0% { width: 0; height: 0; opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+  50% { width: 400px; height: 400px; opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { width: 600px; height: 600px; opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* 震屏效果 */
+.shake {
+  animation: shakeEffect 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shakeEffect {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* ====== 教学模式 ====== */
+.tutorial-section {
+  margin-top: 0;
+  padding: 16px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  max-width: 420px;
+  width: 90%;
+}
+.tutorial-heading {
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.tutorial-lessons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.btn-tutorial {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: left;
+  transition: opacity 0.2s;
+}
+.btn-tutorial:hover { opacity: 0.85; }
+
+/* 教学覆盖层 */
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+.tutorial-bubble {
+  position: fixed;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 30, 60, 0.96);
+  color: #fff;
+  border: 2px solid #667eea;
+  border-radius: 16px;
+  padding: 16px 20px;
+  max-width: 340px;
+  width: 90%;
+  pointer-events: all;
+  z-index: 1001;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.tutorial-progress {
+  font-size: 11px;
+  color: #a0aec0;
+  margin-bottom: 8px;
+}
+.tutorial-prompt {
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.btn-tutorial-next {
+  background: #667eea;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+/* NPC 解释气泡 */
+.npc-explain-bubble {
+  position: fixed;
+  bottom: 200px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(40, 60, 20, 0.92);
+  color: #d4edda;
+  border: 1px solid #28a745;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 13px;
+  max-width: 280px;
+  text-align: center;
+  z-index: 500;
+  animation: fadeInUp 0.3s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* 进贡弹窗手牌区 */
+.tribute-hand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 12px 0;
+}
+.tribute-hand .card { cursor: pointer; }
+.tribute-hand .card.selected { border: 2px solid var(--accent-gold); transform: translateY(-8px); }
+.tribute-hint { font-size: 13px; color: var(--text-muted); }
+
+/* ====== 进贡已收到的牌展示 ====== */
+.tribute-received {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0 4px;
+  font-size: 13px;
+  color: #f1c40f;
+}
+.tribute-received-cards {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+/* ====== 多局积分面板 ====== */
+.round-badge {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: #a0aec0;
+  white-space: nowrap;
+}
+
+/* ====== 结果弹窗重构样式 ====== */
+.result-rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+}
+.result-rank-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  font-size: 15px;
+}
+.result-rank-item.rank-1 { background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.3); }
+.result-rank-item.rank-2 { background: rgba(192,192,192,0.12); }
+.result-rank-item.rank-3 { background: rgba(205,127,50,0.12); }
+.rank-medal { font-size: 18px; width: 28px; text-align: center; }
+.rank-name { flex: 1; text-align: left; }
+.rank-team-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.rank-team-dot.team1 { background: #e74c3c; }
+.rank-team-dot.team2 { background: #3498db; }
+
+.result-level-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 12px 0 8px;
+  font-size: 15px;
+}
+.level-change-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.level-change-label { font-size: 11px; color: #a0aec0; }
+.level-change-value { font-size: 20px; font-weight: 700; }
+.level-change-value .level-old { color: #a0aec0; font-size: 14px; }
+.level-change-value .level-arrow { color: #a0aec0; font-size: 12px; margin: 0 2px; }
+.level-change-value .level-new { color: #fff; }
+.upgrade-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.upgrade-badge.up { background: rgba(46,213,115,0.2); color: #2ed573; border: 1px solid #2ed573; }
+.upgrade-badge.same { background: rgba(160,174,192,0.15); color: #a0aec0; }
+
+.result-bombs {
+  font-size: 13px;
+  color: #a0aec0;
+  margin-top: 6px;
+}
+.result-desc {
+  font-size: 14px;
+  color: #f1c40f;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+/* ====== 单人/多人模式选择 ====== */
+.mode-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.mode-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  background: rgba(0,0,0,0.25);
+  border: 2px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  font-family: var(--font-sans);
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+.mode-btn:hover { filter: brightness(1.15); border-color: rgba(255,255,255,0.25); }
+.mode-btn.active {
+  background: rgba(252,194,0,0.12);
+  border-color: var(--accent-gold);
+  color: var(--text-primary);
+  box-shadow: 0 0 12px rgba(252,194,0,0.2);
+}
+.mode-icon { font-size: 26px; line-height: 1; }
+.mode-label { font-size: 15px; font-weight: 700; }
+.mode-desc { font-size: 11px; color: var(--text-muted); }
+
+/* ====== 单人 NPC 配置面板 ====== */
+.mode-panel {
+  width: 100%;
+}
+
+.config-heading {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.npc-config-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.npc-config-slot {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  transition: border-color 0.2s;
+}
+
+.slot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.slot-role {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.slot-team-a {
+  background: rgba(231,76,60,0.2);
+  color: #ff7f7f;
+  border: 1px solid rgba(231,76,60,0.35);
+}
+.slot-team-b {
+  background: rgba(52,152,219,0.2);
+  color: #7ecfff;
+  border: 1px solid rgba(52,152,219,0.35);
+}
+
+.slot-profile-name {
+  font-size: 12px;
+  color: var(--accent-gold);
+  font-weight: 700;
+}
+
+/* 技能档位选择 */
+.profile-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.profile-tab {
+  flex: 1;
+  padding: 8px 4px 7px;
+  background: rgba(0,0,0,0.3);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 11px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.15s;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.profile-tab:hover { filter: brightness(1.2); border-color: rgba(255,255,255,0.2); }
+.profile-tab:active { transform: scale(0.93); }
+.profile-tab.active {
+  background: linear-gradient(180deg, rgba(252,194,0,0.25) 0%, rgba(252,194,0,0.1) 100%);
+  border-color: var(--accent-gold);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(252,194,0,0.2);
+}
+
+/* 定制技能面板 */
+.skill-panel {
+  margin-top: 10px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.skill-panel-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 14px;
+}
+
+.skill-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  cursor: pointer;
+}
+.skill-item input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: var(--accent-gold);
+  cursor: pointer;
+}
+.skill-item-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  display: block;
+}
+.skill-item-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  display: block;
+  line-height: 1.3;
+}
+
+/* 多人模式面板里的按钮间距 */
+#multi-panel .lobby-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ============================================================================
+ * 阶段 1 视觉骨架重塑 v2（Phase 1 Override Block · v2）
+ * ----------------------------------------------------------------------------
+ * v2 修复点（针对验收意见）：
+ *   ① 阵营色：用 border 简写覆盖（2px muted / 3px primary），消除原 gray 边
+ *   ② 撤销动效：kill .player-info 的 transition + active-turn 的 scale + animation
+ *   ③ 卡牌底色显化：移除 .card 的 inset 白色内发光，让 #F8F6F0 真实可见
+ *   ④ 顶栏金色清理：current-level-badge 与 vs-text 改为中性面板/弱化文字色
+ *   ⑤ 织物纹理：SVG 加显式 width/height，用 opacity 属性确保跨浏览器一致渲染
+ *
+ * 阶段 1 严格不做：动效、按钮改造、手牌交互、左右家旋转 90°
+ * 回滚：删除本块（从注释起到文件末尾）即可恢复阶段 0 状态
+ * ========================================================================== */
+
+/* ─── 1. 桌面背景：径向渐变 + 极轻 SVG noise 织物纹理（v2: 显式尺寸）─── */
+html, body {
+  background-color: var(--surface-felt-main);
+  background-image:
+    /* 织物纹理：220×220 平铺，4% 不透明度（在 0.03-0.05 范围内）*/
+    url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+    /* 径向渐变：中心保持主色到 45%，边缘平滑过渡到 surface-felt-edge */
+    radial-gradient(ellipse at center, var(--surface-felt-main) 0%, var(--surface-felt-main) 45%, var(--surface-felt-edge) 100%);
+  background-size: 220px 220px, 100% 100%;
+  background-attachment: fixed, fixed;
+}
+
+/* ─── 2. 玩家位卡阵营色（v2: 显式 border + kill 动效）──────────────── */
+
+/* 2.0 全局 kill：所有玩家位卡的 transition、transform、animation
+       —— 阶段 1 仅允许静态视觉，回合切换的脉冲/缩放留给阶段 3 */
+.player-info,
+.player-info.active-turn {
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+/* 2a. 队友（对家，player-top）静止态：2px 琥珀 muted 实线边 */
+#player-top .player-info {
+  border: 2px solid var(--faction-ally-muted);
+}
+#player-top .player-avatar {
+  box-shadow: 0 0 0 2px var(--faction-ally-muted);
+}
+#player-top .card-count {
+  background: var(--faction-ally-muted);
+  border: 1px solid var(--faction-ally-highlight);
+}
+
+/* 2b. 队友激活态：3px primary 实线 + 静态 shadow-avatar-ally-active 光晕 */
+#player-top .player-info.active-turn {
+  background: var(--surface-panel);
+  border: 3px solid var(--faction-ally-primary);
+  box-shadow: var(--shadow-avatar-ally-active);
+}
+#player-top .player-info.active-turn .player-avatar {
+  box-shadow: 0 0 0 3px var(--faction-ally-primary);
+}
+#player-top .player-info.active-turn .card-count {
+  background: var(--faction-ally-primary);
+  border: 1px solid var(--faction-ally-highlight);
+}
+
+/* 2c. 对手（左家、右家）静止态：2px 钢蓝 muted 实线边 */
+#player-left .player-info,
+#player-right .player-info {
+  border: 2px solid var(--faction-opp-muted);
+}
+#player-left .player-avatar,
+#player-right .player-avatar {
+  box-shadow: 0 0 0 2px var(--faction-opp-muted);
+}
+#player-left .card-count,
+#player-right .card-count {
+  background: var(--faction-opp-muted);
+  border: 1px solid var(--faction-opp-highlight);
+}
+
+/* 2d. 对手激活态：3px primary 实线 + shadow-avatar-opp-active 光晕 */
+#player-left .player-info.active-turn,
+#player-right .player-info.active-turn {
+  background: var(--surface-panel);
+  border: 3px solid var(--faction-opp-primary);
+  box-shadow: var(--shadow-avatar-opp-active);
+}
+#player-left .player-info.active-turn .player-avatar,
+#player-right .player-info.active-turn .player-avatar {
+  box-shadow: 0 0 0 3px var(--faction-opp-primary);
+}
+#player-left .player-info.active-turn .card-count,
+#player-right .player-info.active-turn .card-count {
+  background: var(--faction-opp-primary);
+  border: 1px solid var(--faction-opp-highlight);
+}
+
+/* ─── 3. 卡牌底色与花色（v2: 移除 inset 白色内发光，让暖白真实可见）─ */
+
+/* 3a. 卡牌底色 + 移除原 inset white glow（这是导致"看起来像纯白"的元凶）*/
+.card {
+  background: var(--surface-card);
+  box-shadow: -2px 0 8px rgba(0,0,0,0.30);  /* 保留外侧投影，去掉 inset 0 0 10px rgba(255,255,255,1) */
+}
+.card:first-child {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.30);
+}
+
+/* 3b. 红色花色（♥♦）：稍深的红，消除与绿桌的补色振动 */
+.card.red {
+  color: var(--suit-red-on-card);
+}
+
+/* 3c. 黑色花色（♠♣）：略带靛色的近黑，视觉更厚 */
+.card.black {
+  color: var(--suit-black-on-card);
+}
+
+/* 3d. 大小王：底色用 surface-card 替换原渐变终点的纯白 */
+.card.joker-red {
+  background: linear-gradient(135deg, #fff0f0, var(--surface-card));
+  color: var(--suit-red-on-card);
+}
+.card.joker-black {
+  background: linear-gradient(135deg, #f0f0ff, var(--surface-card));
+  color: var(--suit-black-on-card);
+}
+
+/* ─── 4. 顶部信息栏 + 汉堡菜单按钮 ───────────────────────────────────── */
+
+/* 4a. 顶栏：从浮动元素升级为全宽 HUD 条 */
+.game-info-bar {
+  top: 0;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-panel);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--surface-panel-border);
+}
+
+/* 4b. 顶栏内 level-display 的旧深底层透明化 */
+.game-info-bar .team-level { font-family: var(--font-num); }
+.level-display {
+  background: transparent;
+  border-color: var(--surface-panel-border);
+  box-shadow: none;
+}
+
+/* 4c. 【v2 修复】顶栏金色污染清理 ——
+       级牌标签、VS 指示器从金色改为中性，让金色仅留给"队友阵营"和"出牌按钮 CTA"两个语义槽 */
+.current-level-badge {
+  background: transparent;
+  border: 1px solid var(--surface-panel-border);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+.vs-text {
+  color: var(--text-secondary);
+  font-style: normal;
+}
+
+/* 4d. 汉堡菜单按钮（href 不变，仅改外观为 44×44 token 化按钮）*/
+.back-to-products {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1;
+  background: var(--surface-panel);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-right: 1px solid var(--surface-panel-border);
+  border-bottom: 1px solid var(--surface-panel-border);
+}
+
+/* ============ 阶段 1 块结束 v2 ============ */
+
+
+/* ============================================================================
+ * 阶段 2 组件改造（Phase 2 Override Block）
+ * ----------------------------------------------------------------------------
+ * 改造范围：
+ *   1. 手牌区          → COMPONENT_SPECS §2  (48×72, -16px重叠, 4 态)
+ *   2. 底部操作按钮组   → COMPONENT_SPECS §4  (三级权重 + 左右分组)
+ *   3. 中央舞台视觉锚   → COMPONENT_SPECS §3.1 (480×220 虚线轮廓 + "等待出牌")
+ *
+ * 阶段 2 严格不做：
+ *   ❌ 任何 transition 时长（hover 可改色但即时切换，0ms）
+ *   ❌ 出牌停留 2.5s 等时序逻辑（阶段 3）
+ *   ❌ 旋转左右家位卡（v2 优化项）
+ *   ❌ 改游戏逻辑
+ *
+ * 回滚：删除本块 + 复原 index.html 的 stage-anchor 节点即可
+ * ========================================================================== */
+
+/* ─── 1. 手牌区改造 ─────────────────────────────────────────────────── */
+
+/* 1.0 手牌区容器：底部留 32px 间距，分离"我的牌"与"我的操作" */
+.hand-area {
+  padding: var(--space-lg) 0 var(--space-xl);
+  gap: 0;  /* gap 由 card 的 margin-left 接管 */
+}
+
+/* 1a. 卡牌静止态：48×72，-16px 错位，每张露出 32px */
+.hand-area .card {
+  width: 48px;
+  height: 72px;
+  margin-left: -16px;
+  padding: 4px 4px 0 4px;
+  box-shadow: var(--shadow-card-rest);
+  transition: none;       /* 阶段 2 禁止 transition 时长 */
+  border-radius: var(--radius-card);
+}
+.hand-area .card:first-child {
+  margin-left: 0;
+  box-shadow: var(--shadow-card-rest);
+}
+
+/* 1b. 卡牌点数 / 花色字号按 token 落地 */
+.hand-area .card .card-rank {
+  font-size: var(--type-card-rank-size);
+  font-weight: var(--type-card-rank-weight);
+  line-height: var(--type-card-rank-lh);
+  letter-spacing: var(--type-card-rank-ls);
+}
+.hand-area .card .card-suit {
+  font-size: var(--type-card-suit-size);
+  font-weight: var(--type-card-suit-weight);
+  line-height: var(--type-card-suit-lh);
+  margin-top: 0;
+}
+
+/* 1c. 悬停态（焦点放大）：translateY(-10) + scale(1.08) */
+.hand-area .card:hover:not(.selected):not(.unplayable) {
+  transform: translateY(-10px) scale(1.08);
+  box-shadow: var(--shadow-card-hover);
+  z-index: 10;
+}
+
+/* 1d. 选中态：translateY(-20) + 金色描边阴影（来自 shadow-card-selected token）*/
+.hand-area .card.selected {
+  transform: translateY(-20px);
+  box-shadow: var(--shadow-card-selected);
+  border-color: var(--surface-card);  /* 让外层 token 描边作为唯一选中信号 */
+  z-index: 100 !important;
+}
+
+/* 1e. 不可出牌态（class 由游戏逻辑后续接入）：opacity 0.40 + saturate 0.3 */
+.hand-area .card.unplayable {
+  opacity: 0.40;
+  filter: saturate(0.3);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ─── 2. 底部操作按钮组 ─────────────────────────────────────────────── */
+
+/* 2.0 容器：左工具区 / 右操作区 分组，中间用 margin-left:auto 拉开 */
+.action-buttons {
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md);
+}
+
+/* 2.0.1 kill 原 .btn 的 transition + transform 高光块阴影残留 */
+.action-buttons .btn {
+  transition: none !important;
+  text-transform: none;
+  letter-spacing: 0;
+  text-shadow: none;
+  border: none;
+}
+
+/* 2a. 工具按钮（理牌、提示）—— 80×32 透明填充，沉入背景 */
+.action-buttons #sort-btn,
+.action-buttons #hint-btn {
+  width: 80px;
+  height: 32px;
+  padding: 0;
+  font-size: var(--type-btn-tertiary-size);
+  font-weight: var(--type-btn-tertiary-weight);
+  background: var(--semantic-tertiary);
+  border: 1px solid var(--semantic-tertiary-border);
+  color: var(--text-on-tertiary-btn);
+  border-radius: var(--radius-btn-tertiary);
+  box-shadow: none;
+}
+.action-buttons #sort-btn:hover,
+.action-buttons #hint-btn:hover {
+  background: rgba(255,255,255,0.14);
+  filter: none;
+}
+.action-buttons #sort-btn:active,
+.action-buttons #hint-btn:active {
+  background: rgba(255,255,255,0.06);
+  transform: none;
+}
+
+/* 2b. 中间分隔：让"不出"开始向右贴齐，与工具区拉开 var(--space-xl) 以上 */
+.action-buttons #pass-btn {
+  margin-left: auto;
+  width: 96px;
+  height: 40px;
+  padding: 0;
+  font-size: var(--type-btn-secondary-size);
+  font-weight: var(--type-btn-secondary-weight);
+  letter-spacing: var(--type-btn-secondary-ls);
+  background: var(--semantic-secondary);
+  color: var(--text-on-secondary-btn);
+  border-radius: var(--radius-btn-secondary);
+  box-shadow: var(--shadow-btn-rest);
+}
+.action-buttons #pass-btn:hover {
+  background: var(--semantic-secondary-hover);
+  filter: none;
+}
+.action-buttons #pass-btn:active {
+  background: var(--semantic-secondary);
+  transform: none;
+  box-shadow: var(--shadow-btn-pressed);
+}
+
+/* 2c. 主 CTA：出牌 —— 120×48 金色填充，最大视觉权重 */
+.action-buttons #play-btn {
+  width: 120px;
+  height: 48px;
+  padding: 0;
+  font-size: var(--type-btn-primary-size);
+  font-weight: var(--type-btn-primary-weight);
+  letter-spacing: var(--type-btn-primary-ls);
+  background: var(--semantic-primary);
+  color: var(--text-on-primary-btn);
+  border-radius: var(--radius-btn-primary);
+  box-shadow: var(--shadow-btn-rest);
+}
+.action-buttons #play-btn:hover {
+  background: var(--semantic-primary-hover);
+  filter: none;
+}
+.action-buttons #play-btn:active {
+  background: var(--semantic-primary-pressed);
+  transform: none;
+  box-shadow: var(--shadow-btn-pressed);
+}
+/* 2c.1 出牌按钮禁用态：保持金色，只降透明度（语义不漂移）*/
+.action-buttons #play-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── 3. 中央舞台视觉锚 ─────────────────────────────────────────────── */
+
+/* 3a. 480×220 虚线舞台框：常驻可见，作为视觉锚和未来出牌的落点 */
+.stage-anchor {
+  width: 480px;
+  height: 220px;
+  background: var(--surface-felt-stage);
+  border: 1px dashed rgba(255,255,255,0.10);
+  border-radius: var(--radius-stage-hint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* 3b. "等待出牌"弱化标签 —— 在舞台中央，告诉玩家"这里是行动会发生的位置" */
+.stage-anchor-label {
+  color: var(--text-muted);
+  font-size: var(--type-system-msg-size);
+  font-weight: var(--type-system-msg-weight);
+  line-height: var(--type-system-msg-lh);
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+
+/* 3c. center-play-area 内 play-info 浮在舞台之上（"发牌结束"等系统消息的临时显示）*/
+.center-play-area {
+  pointer-events: none;
+}
+.center-play-area .play-info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* 原 zoomFade 动画继续生效，但用 translate 锚点叠加在舞台中央上层 */
+  transform: translate(-50%, -50%);
+  width: max-content;
+}
+/* 3c.1 重写 zoomFade：保留其他属性，仅修正 transform 起止点为含 translate 锚 */
+@keyframes zoomFade {
+  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  15%  { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  30%  { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
+  80%  { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.1); opacity: 0; }
+}
+
+/* ============ 阶段 2 块结束 ============ */
+
+
+/* ============================================================================
+ * 阶段 3 · 任务 1：基础过渡动效（Phase 3 Task 1 Override Block）
+ * ----------------------------------------------------------------------------
+ * 目标：把 Phase 1 v2 / Phase 2 中故意 kill 的 `transition: none` 用
+ *       DESIGN_TOKENS §6 中的时长 + 缓动曲线恢复回来。
+ *
+ * 不做：
+ *   ❌ 回合脉冲光晕（任务 2）
+ *   ❌ 出牌飞行 / 停留时序（任务 3）
+ *   ❌ AI 思考省略号（任务 4）
+ *   ❌ 不改 token 数值，不引入动效库
+ *
+ * Token 引用：
+ *   --duration-fast (150ms)        — 悬停反馈、按钮颜色切换
+ *   --duration-normal (250ms)      — 选中、状态切换
+ *   --ease-out-enter               — 元素入场（hover 上升）
+ *   --ease-in-out-state            — 状态切换（active-turn 切换、按下进入）
+ *   --spring-feedback              — 交互反馈（选中咔哒、按钮松开弹回）
+ *
+ * 实施约束：
+ *   Phase 1 v2 / Phase 2 中用了 `transition: none !important`，必须用 !important
+ *   反向覆盖。这是已知的 anti-pattern 但在阶段化改造中可接受，回滚边界清晰。
+ *
+ * 回滚：删除本块即可回到阶段 2 状态。
+ * ========================================================================== */
+
+/* ─── 1. 玩家位卡（覆盖 Phase 1 v2 的 none !important）─────────────── */
+/* 切换 active-turn 时，边框/光晕/底色 250ms 内平滑过渡 */
+.player-info,
+.player-info.active-turn {
+  transition:
+    border-color var(--duration-normal) var(--ease-in-out-state),
+    border-width var(--duration-normal) var(--ease-in-out-state),
+    background-color var(--duration-normal) var(--ease-in-out-state),
+    box-shadow var(--duration-normal) var(--ease-in-out-state)
+    !important;
+}
+.player-avatar {
+  transition: box-shadow var(--duration-normal) var(--ease-in-out-state);
+}
+.card-count {
+  transition:
+    background-color var(--duration-normal) var(--ease-in-out-state),
+    border-color var(--duration-normal) var(--ease-in-out-state);
+}
+
+/* ─── 2. 卡牌（覆盖 Phase 2 的 transition: none）───────────────────── */
+
+/* 2a. 静止 → 悬停：fast (150ms) + ease-out-enter（上升入场）*/
+.hand-area .card {
+  transition:
+    transform var(--duration-fast) var(--ease-out-enter),
+    box-shadow var(--duration-fast) var(--ease-out-enter)
+    !important;
+}
+
+/* 2b. 静止 → 选中：normal (250ms) + spring-feedback（带 12% 超出回弹的"咔哒"感）*/
+.hand-area .card.selected {
+  transition:
+    transform var(--duration-normal) var(--spring-feedback),
+    box-shadow var(--duration-normal) var(--spring-feedback)
+    !important;
+}
+
+/* ─── 3. 按钮（覆盖 Phase 2 的 transition: none !important）────────── */
+
+/* 3a. baseline transition：松开/默认 → 进入这里
+       transform 用 spring-feedback（松开时带弹回），其他属性用 fast/ease-out */
+.action-buttons .btn {
+  transition:
+    background-color var(--duration-fast) var(--ease-out-enter),
+    box-shadow var(--duration-fast) var(--ease-out-enter),
+    transform var(--duration-fast) var(--spring-feedback)
+    !important;
+}
+
+/* 3b. 按下时进入 :active 的 transition：用 ease-in-out-state（无回弹收紧）*/
+.action-buttons .btn:active {
+  transition:
+    background-color var(--duration-fast) var(--ease-out-enter),
+    box-shadow var(--duration-fast) var(--ease-out-enter),
+    transform var(--duration-fast) var(--ease-in-out-state)
+    !important;
+}
+
+/* 3c. 按下视觉反馈：scale(0.96)（DESIGN_TOKENS §6.3E）
+       Phase 2 中显式 transform: none 仅为禁掉旧 .btn:active 的 scale(0.92)，
+       此处显式声明 0.96 覆盖之 */
+.action-buttons #play-btn:active,
+.action-buttons #pass-btn:active,
+.action-buttons #sort-btn:active,
+.action-buttons #hint-btn:active {
+  transform: scale(0.96) !important;
+}
+
+/* ─── 4. 按钮组整体 opacity 渐变（非我回合 ↔ 我的回合）─────────────── */
+/* JS（gameUI.js:261）改 inline opacity 时，让此过渡平滑生效 */
+.action-buttons {
+  transition: opacity var(--duration-normal) var(--ease-in-out-state);
+}
+
+/* ─── 5. 汉堡菜单按钮 hover 反馈 ────────────────────────────────────── */
+.back-to-products {
+  transition: background-color var(--duration-fast) var(--ease-out-enter);
+}
+.back-to-products:hover {
+  background: rgba(20, 56, 36, 0.92);
+}
+
+/* ============ 阶段 3 任务 1 块结束 ============ */
+
+
+/* ============================================================================
+ * 阶段 3 · 任务 2：回合脉冲光晕（Phase 3 Task 2 Override Block）
+ * ----------------------------------------------------------------------------
+ * 目标：解决初始 REPORT.md 的 P0「回合状态不可感知」。让"当前出牌方"在外周视觉
+ *       中也能被自然捕捉——通过持续的脉冲光晕，玩家不需要专门去看就能知道谁在动。
+ *
+ * 实施 3 件事（来自 DESIGN_TOKENS §6.3D）：
+ *   ① 进入 active-turn 用 slow (400ms) + spring-feedback（光晕"涌现"感）
+ *   ② 队友（player-top）的脉冲：琥珀光晕 alpha 在 0.55 ↔ 0.385 之间循环
+ *   ③ 对手（player-left/right）的脉冲：钢蓝光晕 alpha 在 0.50 ↔ 0.35 之间循环
+ *
+ * 周期：1200ms (var(--duration-pulse-period))，曲线 ease-in-out-state，infinite
+ *
+ * 不做：
+ *   ❌ 出牌按钮的 scale(1.04→1.0) 涌现（需 JS hook 触发，留给任务 3）
+ *   ❌ AI 思考省略号（任务 4）
+ *   ❌ 改 token 数值
+ *
+ * 关键 CSS 行为：
+ *   - CSS animation 优先级 > transition：脉冲跑起来后 box-shadow 由 keyframe 接管
+ *   - 移除 .active-turn 时 animation 立即停止，box-shadow 从最后帧值
+ *     transition 回非 active 基线（task 1 设的 normal+ease-in-out）
+ *
+ * 回滚：删除本块即可回到任务 1 状态。
+ * ========================================================================== */
+
+/* ─── 1. 进入 active-turn 改用 slow + spring（涌现感）────────────────── */
+/* 覆盖任务 1 的 normal + ease-in-out（那个仍用于"离开 active"的过渡）*/
+.player-info.active-turn {
+  transition:
+    border-color   var(--duration-slow) var(--spring-feedback),
+    border-width   var(--duration-slow) var(--spring-feedback),
+    background-color var(--duration-slow) var(--spring-feedback),
+    box-shadow     var(--duration-slow) var(--spring-feedback)
+    !important;
+}
+.player-info.active-turn .player-avatar {
+  transition: box-shadow var(--duration-slow) var(--spring-feedback);
+}
+
+/* ─── 2. 队友（player-top）脉冲：琥珀光晕 alpha 在 0.55 ↔ 0.385 间循环 ─ */
+@keyframes pulse-glow-ally {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px var(--faction-ally-primary),
+      0 0 16px rgba(232, 162, 48, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px var(--faction-ally-primary),
+      0 0 16px rgba(232, 162, 48, 0.385);
+  }
+}
+#player-top .player-info.active-turn {
+  animation: pulse-glow-ally var(--duration-pulse-period) var(--ease-in-out-state) infinite !important;
+}
+
+/* ─── 3. 对手（player-left/right）脉冲：钢蓝光晕 alpha 在 0.50 ↔ 0.35 间循环 ─ */
+@keyframes pulse-glow-opp {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px var(--faction-opp-primary),
+      0 0 16px rgba(75, 143, 196, 0.50);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px var(--faction-opp-primary),
+      0 0 16px rgba(75, 143, 196, 0.35);
+  }
+}
+#player-left .player-info.active-turn,
+#player-right .player-info.active-turn {
+  animation: pulse-glow-opp var(--duration-pulse-period) var(--ease-in-out-state) infinite !important;
+}
+
+/* ============ 阶段 3 任务 2 块结束 ============ */
+
+
+/* ============================================================================
+ * 阶段 3 · 任务 3：出牌飞行与停留（Phase 3 Task 3 Override Block）
+ * ----------------------------------------------------------------------------
+ * 任务 3 是 Phase 3 中最复杂的，分 4 个子任务：
+ *   3.1 ✅ 出牌按钮一次性涌现（scale 1.04 → 1.0，spring 落地）—— 当前 session
+ *   3.2 ⏳ 卡牌从手牌位置弧线飞向中央舞台对应象限
+ *   3.3 ⏳ 牌组停留 2500ms 后淡出
+ *   3.4 ⏳ 出牌方位置 4 象限分布
+ *
+ * 任务 3 是首次需要改 JS 的子任务。
+ * 回滚：删除本块 + 还原 gameUI.js 中 task 3 相关 hook。
+ * ========================================================================== */
+
+/* ─── 子任务 3.1：出牌按钮一次性涌现 ──────────────────────────────────
+ *
+ * spec（DESIGN_TOKENS §6.3D）：
+ *   "我的回合特殊处理：出牌按钮触发一次 spring-feedback scale(1.04→1.0)，
+ *    提示'可以操作了'"
+ *
+ * 实现：
+ *   - keyframe 从 1.04 缩到 1.0
+ *   - 用 spring-feedback 缓动曲线，过 1.0 后会有 ~12% overshoot 短暂跳到
+ *     ~0.99 再回到 1.0 —— 形成"咔哒落地"的物理感
+ *   - JS hook 在 gameUI.js updateTurnHighlight 内：从"非我"切换到"我"
+ *     的瞬间给 #play-btn 加 .summon class，触发动画
+ *   - JS 用 void offsetWidth 强制 reflow 重启动画（仿照已有 triggerBombEffect）
+ * ─────────────────────────────────────────────────────────────────── */
+
+@keyframes play-btn-summon {
+  0%   { transform: scale(1.04); }
+  100% { transform: scale(1.0); }
+}
+
+.action-buttons #play-btn.summon {
+  animation: play-btn-summon var(--duration-normal) var(--spring-feedback) 1;
+}
+
+/* ─── 子任务 3.2：卡牌从手牌位置弧线飞向中央舞台对应象限 ──────────────
+ *
+ * spec（COMPONENT_SPECS §3.2）：
+ *   "出牌后牌组飞入舞台对应象限...多张牌错开 40ms...stagger"
+ *
+ * 简化方案（不算每张手牌精确起点）：
+ *   - 4 个 fly-from-* keyframe，从屏幕外固定方向飞入到 stage 内的象限容器
+ *   - 距离按 280-380px（够大让动效"够气派"，不脱出可视区）
+ *   - 多张牌的 animation-delay 由 JS 在 showPlayedCards 内设
+ *
+ * 简化代价：每张牌的 source 不是它在玩家手中的精确位置（手牌已被 removeCardsFromHand
+ *           移除）。但视觉上方向感正确——玩家从飞入方向能立刻知道是谁出的牌。
+ * ─────────────────────────────────────────────────────────────────── */
+
+/* 4 个象限容器：在 stage-anchor 内绝对定位 */
+.stage-anchor {
+  position: relative;  /* quadrant 用 absolute 相对它定位 */
+}
+
+.stage-quadrant {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* 4 象限位置：spec §3.2 的"南/北/西/东"（玩家视角下/上/左/右）*/
+#stage-bottom { left: 50%; bottom: 12%; transform: translateX(-50%); }
+#stage-top    { left: 50%; top: 12%;    transform: translateX(-50%); }
+#stage-left   { left: 8%;  top: 50%;    transform: translateY(-50%); }
+#stage-right  { right: 8%; top: 50%;    transform: translateY(-50%); }
+
+/* "等待出牌"标签层级压在 quadrant 之下，让牌组覆盖时标签自然消失 */
+.stage-anchor-label {
+  position: relative;
+  z-index: 1;
+}
+
+/* 4 个飞入 keyframes —— 起点距离 280-380px（够气派，不脱出可视）*/
+@keyframes fly-from-bottom {
+  0%   { transform: translateY(280px); opacity: 0; }
+  100% { transform: translateY(0);     opacity: 1; }
+}
+@keyframes fly-from-top {
+  0%   { transform: translateY(-280px); opacity: 0; }
+  100% { transform: translateY(0);      opacity: 1; }
+}
+@keyframes fly-from-left {
+  0%   { transform: translateX(-380px); opacity: 0; }
+  100% { transform: translateX(0);      opacity: 1; }
+}
+@keyframes fly-from-right {
+  0%   { transform: translateX(380px); opacity: 0; }
+  100% { transform: translateX(0);     opacity: 1; }
+}
+
+/* 应用：每张飞入卡牌按方向 + duration-slow + ease-out-enter
+   animation-fill-mode: backwards 让带 delay 的牌在 delay 期间保持 0% 帧（不闪现）*/
+.stage-quadrant .card.flying-from-bottom {
+  animation: fly-from-bottom var(--duration-slow) var(--ease-out-enter) backwards;
+}
+.stage-quadrant .card.flying-from-top {
+  animation: fly-from-top    var(--duration-slow) var(--ease-out-enter) backwards;
+}
+.stage-quadrant .card.flying-from-left {
+  animation: fly-from-left   var(--duration-slow) var(--ease-out-enter) backwards;
+}
+.stage-quadrant .card.flying-from-right {
+  animation: fly-from-right  var(--duration-slow) var(--ease-out-enter) backwards;
+}
+
+/* ─── 子任务 3.3：牌组停留 + 淡出 ─────────────────────────────────────
+ *
+ * spec（COMPONENT_SPECS §3.2）：
+ *   "显示时长：duration-linger（2500ms），之后 fade out（duration-normal）"
+ *   "下家出牌后：前一手牌立即开始淡出，不等满 2500ms"
+ *
+ * 实现：
+ *   - .stage-quadrant 加 opacity transition（duration-normal + ease-in-out-state）
+ *   - .fading-out class 把 opacity 拉到 0
+ *   - JS（gameUI.js::showPlayedCards）：① 新出牌时其他 quadrant 立即 fadeOut
+ *     ② 给当前 quadrant 排 2500ms timer 自动 fadeOut
+ *   - fadeOut 完成后 innerHTML 清空 + 移除 fading-out class，恢复 opacity 1
+ *
+ * "等待出牌"标签自然 re-emerge（z-index 已处理，4 quadrant 都空时无遮挡）
+ * ─────────────────────────────────────────────────────────────────── */
+
+.stage-quadrant {
+  /* 保持 task 3.2 既有 absolute 定位，加 opacity transition */
+  transition: opacity var(--duration-normal) var(--ease-in-out-state);
+  opacity: 1;
+}
+
+.stage-quadrant.fading-out {
+  opacity: 0;
+}
+
+/* ============ 阶段 3 任务 3 块结束（子任务 3.4 已在 3.2 内顺手解决）============ */
+
+
+/* ============================================================================
+ * 阶段 3 · 任务 4：AI 思考省略号（Phase 3 Task 4 Override Block）
+ * ----------------------------------------------------------------------------
+ * spec（COMPONENT_SPECS §1.3 + DESIGN_TOKENS §6.3D）：
+ *   "AI 思考中：在激活光晕基础上，昵称旁显示'…'动态省略号
+ *    （3 点循环，duration-normal × 3 周期 = 750ms）"
+ *
+ * 实现：
+ *   - 3 个 .thinking-dot span，opacity 错开 250ms 淡入淡出
+ *   - 总周期 750ms（3 × duration-normal），形成"波浪"效果
+ *   - 默认隐藏；只在父级 .player-info.active-turn 时可见
+ *   - 因为我（player-bottom）没有 .player-info 容器，省略号天然不在我身上出现
+ *   - 当回合切换时（active-turn class 移走），省略号自动消失
+ *
+ * 零 JS 改动：纯 CSS 通过 .active-turn 父级选择器自动控制显隐
+ * 回滚：删除本块 + 还原 index.html 中 3 个 thinking-dots 节点
+ * ========================================================================== */
+
+.thinking-dots {
+  display: inline-flex;
+  gap: 1px;
+  margin-left: var(--space-xs);
+  visibility: hidden;       /* 默认不占位也不可见 */
+  font-size: 18px;          /* 比昵称稍大让点更明显 */
+  font-weight: 700;
+  color: var(--text-secondary);
+  line-height: 1;
+  letter-spacing: 1px;
+  pointer-events: none;
+}
+
+/* 父级 active-turn 时显示。因为 player-bottom 没有 player-info，
+   所以这条规则只可能匹配 top/left/right 的对手位卡 */
+.player-info.active-turn .thinking-dots {
+  visibility: visible;
+}
+
+/* 阵营色融合：队友（player-top）用琥珀色调，对手（left/right）用钢蓝色调 */
+#player-top .thinking-dots { color: var(--faction-ally-highlight); }
+#player-left .thinking-dots,
+#player-right .thinking-dots { color: var(--faction-opp-highlight); }
+
+/* 单点：默认弱化态（opacity 0.2），动画把它推到峰值 1.0 */
+.thinking-dot {
+  display: inline-block;
+  opacity: 0.2;
+  animation: thinking-dot-fade var(--duration-pulse-period) var(--ease-in-out-state) infinite;
+}
+
+/* 3 个点错开 duration-normal (250ms)，total period 750ms 但用 1200ms 周期更柔和
+   （duration-pulse-period 与回合脉冲共享周期 token，视觉上更协调） */
+.thinking-dots .thinking-dot:nth-child(1) { animation-delay: 0ms; }
+.thinking-dots .thinking-dot:nth-child(2) { animation-delay: 250ms; }
+.thinking-dots .thinking-dot:nth-child(3) { animation-delay: 500ms; }
+
+@keyframes thinking-dot-fade {
+  0%, 60%, 100% { opacity: 0.2; }   /* 大部分时间是弱化态 */
+  20%           { opacity: 1.0; }   /* 短暂峰值 */
+}
+
+/* ============ 阶段 3 任务 4 块结束 ============ */
+
+
+/* ============================================================================
+ * NPC P1.2：可解释性信息泡（NPC Trace Bubble）
+ * ----------------------------------------------------------------------------
+ * 仅在 ?debug=1 模式下显示（body.debug-mode）。
+ * 每个对手位卡（top/left/right）旁有一个独立信息泡，显示该 NPC 最近一次决策的 trace。
+ * 显示时长 = duration-linger (2500ms)，与 stage-quadrant 出牌停留同步。
+ * 阵营色融合：队友琥珀，对手钢蓝。
+ * ========================================================================== */
+
+.npc-trace-bubble {
+  position: absolute;
+  display: none;
+  width: 260px;             /* 明确宽度，避免 left/right 单边定位时 shrink-to-fit 把字撑成竖排 */
+  box-sizing: border-box;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-panel);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--surface-panel-border);
+  font-size: var(--type-hint-size);
+  font-weight: var(--type-hint-weight);
+  line-height: var(--type-hint-lh);
+  color: var(--text-primary);
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-in-out-state);
+}
+
+/* 仅 debug 模式下显示 */
+body.debug-mode .npc-trace-bubble.visible {
+  display: block;
+  opacity: 1;
+}
+
+/* 4 个方向的位置（紧贴对应位卡，保留呼吸距离）*/
+#npc-trace-top   { top: 60px;  left: 50%; transform: translateX(-50%); }
+#npc-trace-left  { left: 130px; top: 50%;  transform: translateY(-50%); }
+#npc-trace-right { right: 130px; top: 50%; transform: translateY(-50%); }
+
+/* 阵营色融合：左边框（≈4px）配合阵营色，与位卡呼应 */
+#player-top  .npc-trace-bubble { border-left: 4px solid var(--faction-ally-primary); }
+#player-left .npc-trace-bubble,
+#player-right .npc-trace-bubble { border-left: 4px solid var(--faction-opp-primary); }
+
+/* 头部主因（PrimaryReason 中文解释）*/
+.npc-trace-header {
+  font-size: var(--type-system-msg-size);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+/* 技能列表 */
+.npc-trace-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
+}
+.npc-trace-skill-chip {
+  padding: 1px 6px;
+  border-radius: var(--radius-badge);
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--faction-ally-muted);
+  color: var(--text-primary);
+}
+#player-left .npc-trace-skill-chip,
+#player-right .npc-trace-skill-chip { background: var(--faction-opp-muted); }
+
+/* 技能详情（skillNotes 列表）*/
+.npc-trace-notes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: var(--text-secondary);
+}
+.npc-trace-notes li {
+  margin-bottom: 2px;
+}
+.npc-trace-notes li::before {
+  content: '· ';
+  color: var(--text-muted);
+}
+
+/* ============ NPC P1.2 信息泡块结束 ============ */
+
+
+/* ============================================================================
+ * v1.2 玩起来爽（音效开关 + 发牌动画 + 结算动画 + 炸弹特效升级）
+ * 决策 1：克制但高级——动画短促、曲线物理感、不加喜庆爆效
+ * ========================================================================== */
+
+/* ─── 音效开关（顶栏右侧）─── */
+.sound-toggle {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--surface-panel-border);
+  border-radius: var(--radius-btn-tertiary);
+  background: var(--semantic-tertiary);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out-enter);
+}
+.sound-toggle:hover { background: rgba(255,255,255,0.14); }
+
+/* ─── 发牌动画：dealing 期间卡牌按 --deal-i stagger 入场 ─── */
+@keyframes deal-in {
+  0%   { transform: translateY(-46px) scale(0.85); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.hand-area.dealing .card {
+  animation: deal-in var(--duration-normal) var(--ease-out-enter) backwards;
+  animation-delay: calc(var(--deal-i, 0) * 32ms);
+}
+
+/* ─── 结算弹窗入场动画 ─── */
+@keyframes result-pop {
+  0%   { transform: scale(0.88); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+#result-overlay > * {
+  animation: result-pop var(--duration-slow) var(--spring-feedback);
+}
+@keyframes rank-slide {
+  0%   { transform: translateX(-24px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+.result-rank-item {
+  animation: rank-slide var(--duration-normal) var(--ease-out-enter) backwards;
+}
+.result-rank-item:nth-child(1) { animation-delay: 100ms; }
+.result-rank-item:nth-child(2) { animation-delay: 200ms; }
+.result-rank-item:nth-child(3) { animation-delay: 300ms; }
+.result-rank-item:nth-child(4) { animation-delay: 400ms; }
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.18); }
+}
+.upgrade-badge.up {
+  animation: badge-pulse 0.9s var(--ease-in-out-state) 2;
+  animation-delay: 550ms;
+}
+
+/* ─── 炸弹特效升级：冲击波环（叠加在现有 bomb-effect 之上）─── */
+@keyframes bomb-ring {
+  0%   { width: 40px; height: 40px; opacity: 0.85; border-width: 6px; }
+  100% { width: 520px; height: 520px; opacity: 0; border-width: 1px; }
+}
+.bomb-effect.animate::after {
+  content: '';
+  position: fixed;
+  left: 50%; top: 45%;
+  width: 40px; height: 40px;
+  transform: translate(-50%, -50%);
+  border: 6px solid var(--semantic-warning);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: bomb-ring 0.55s var(--ease-out-enter) forwards;
+}
+
+/* 震屏强化（覆盖原 shake，幅度更大、带旋转）*/
+@keyframes shake-hard {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  20% { transform: translate(-7px, 4px) rotate(-0.4deg); }
+  40% { transform: translate(6px, -3px) rotate(0.3deg); }
+  60% { transform: translate(-4px, -4px) rotate(-0.2deg); }
+  80% { transform: translate(4px, 3px) rotate(0.2deg); }
+}
+#game-screen.shake { animation: shake-hard 0.45s var(--ease-in-out-state); }
+
+/* ============ v1.2 块结束 ============ */
+
+
+/* ============================================================================
+ * v1.3 商用感（托管 + 记牌器 + 读秒 + 战绩段位）
+ * ========================================================================== */
+
+/* ─── 托管按钮态 ─── */
+.btn-auto { background: var(--semantic-tertiary); border: 1px solid var(--semantic-tertiary-border); color: var(--text-on-tertiary-btn); }
+.btn-auto.auto-on {
+  background: var(--semantic-warning);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(224, 92, 26, 0.5);
+}
+
+/* ─── 出牌读秒 ─── */
+.turn-timer {
+  position: absolute;
+  right: 22px;
+  bottom: 180px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface-panel);
+  border: 2px solid var(--faction-ally-primary);
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+.turn-timer.urgent {
+  border-color: var(--semantic-danger);
+  color: var(--semantic-danger);
+  animation: badge-pulse 0.5s var(--ease-in-out-state) infinite;
+}
+
+/* ─── 记牌器面板 ─── */
+.card-counter {
+  position: fixed;
+  right: 12px;
+  top: 64px;
+  width: 132px;
+  padding: var(--space-sm);
+  background: var(--surface-panel);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--surface-panel-border);
+  border-radius: var(--radius-panel);
+  z-index: 40;
+}
+.card-counter-title { font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.card-counter-hint { font-size: 10px; font-weight: 400; color: var(--text-muted); }
+.card-counter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+.cc-cell {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 2px 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  font-size: 11px;
+}
+.cc-rank { color: var(--text-secondary); font-weight: 600; }
+.cc-left { color: var(--text-primary); font-weight: 700; }
+.cc-cell.depleted { opacity: 0.35; }
+.cc-cell.depleted .cc-left { color: var(--text-muted); }
+.cc-cell.is-level { border: 1px solid var(--faction-ally-muted); }
+
+/* ─── 大厅战绩行 ─── */
+.player-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-sm);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--surface-panel-border);
+  border-radius: var(--radius-btn-secondary);
+  font-size: 12px;
+}
+.stats-rank { font-weight: 700; color: var(--text-primary); }
+.stats-record { color: var(--text-secondary); }
+
+/* ============ v1.3 块结束 ============ */
+
+
+/* ============================================================================
+ * v1.5 移动端适配（覆盖 Phase 0-3 + v1.1-v1.4 全部新增组件）
+ * 设计基线：375-430px 宽手机竖屏；触摸目标 ≥40px
+ * ========================================================================== */
+@media (max-width: 600px) {
+  /* ─── 顶栏 HUD：压缩为单行小字 ─── */
+  .game-info-bar { padding: 4px 8px; gap: 8px; flex-wrap: nowrap; }
+  .team-level { font-family: var(--font-num); }
+.level-display { padding: 4px 10px; font-size: 12px; gap: 6px; }
+  .current-level-badge { padding: 3px 8px; font-size: 11px; }
+  .round-badge { font-size: 11px; }
+  .sound-toggle { width: 28px; height: 28px; font-size: 12px; }
+  .back-to-products { width: 36px; height: 36px; font-size: 18px; }
+
+  /* ─── 玩家位卡：紧凑 ─── */
+  .player-info { padding: 3px 8px; font-size: 11px; gap: 4px; }
+  .player-avatar { width: 24px; height: 24px; font-size: 16px; }
+  .card-count { padding: 1px 6px; font-size: 11px; }
+  .player-top { top: 44px; }
+  .player-left { left: 6px; }
+  .player-right { right: 6px; }
+  .thinking-dots { font-size: 13px; }
+
+  /* ─── 中央舞台：按比例缩 ─── */
+  .stage-anchor { width: min(86vw, 340px); height: 160px; }
+  #stage-left  { left: 4%; }
+  #stage-right { right: 4%; }
+  .stage-quadrant .card { transform: scale(0.85); }
+
+  /* ─── 出牌飞行距离缩短（小屏不需要 280px+ 的入场距离）─── */
+  /* keyframe 距离由桌面版定义，移动端视觉可接受，不重定义以省维护 */
+
+  /* ─── 手牌：移动端压缩（覆盖 Phase 2 的 .hand-area .card 桌面尺寸）─── */
+  .hand-area .card { width: 44px; height: 64px; margin-left: -30px; }
+  .hand-area .card .card-rank { font-size: 15px; }
+  .hand-area .card .card-suit { font-size: 11px; }
+
+  /* ─── 按钮组：保证触摸目标 ─── */
+  .action-buttons { gap: 6px; padding: 0 8px; }
+  .action-buttons #play-btn { width: 96px; height: 44px; font-size: 14px; }
+  .action-buttons #pass-btn { width: 76px; height: 40px; font-size: 13px; }
+  .action-buttons #sort-btn,
+  .action-buttons #hint-btn,
+  .action-buttons #auto-btn { width: 60px; height: 32px; font-size: 11px; }
+
+  /* ─── v1.3 组件 ─── */
+  .turn-timer { right: 10px; bottom: 150px; width: 38px; height: 38px; font-size: 15px; }
+  .card-counter { right: 6px; top: 48px; width: 116px; padding: 6px; }
+  .cc-cell { font-size: 10px; padding: 1px 4px; }
+  .player-stats { font-size: 11px; padding: 6px 10px; }
+
+  /* ─── NPC trace bubble（debug 模式）─── */
+  .npc-trace-bubble { width: 200px; font-size: 10px; }
+  #npc-trace-left  { left: 88px; }
+  #npc-trace-right { right: 88px; }
+
+  /* ─── 进贡弹窗 ─── */
+  .tribute-hand .card { transform: scale(0.9); }
+}
+
+/* ============ v1.5 块结束 ============ */
+
+
+/* ============================================================================
+ * review 修复块（2026-06-12 全面 review 后的视觉修正）
+ * ========================================================================== */
+
+/* 废弃容器：出牌已统一进中央舞台，三个空框不再占位 */
+.played-cards-area { display: none; }
+
+/* pass 反馈胶囊（中央舞台 quadrant 内） */
+.pass-chip {
+  display: inline-block;
+  padding: 4px 14px;
+  background: var(--surface-panel);
+  border: 1px solid var(--surface-panel-border);
+  border-radius: var(--radius-badge);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* play-info 位置：舞台上缘（不盖左右象限牌组） */
+.center-play-area .play-info {
+  top: 12%;
+}
+
+/* 出牌/不出/提示禁用态视觉 */
+.action-buttons #play-btn:disabled,
+.action-buttons #pass-btn:disabled,
+.action-buttons #hint-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* review-P2：移动端 fly-from 动画带 scale，消除落地跳缩 */
+@media (max-width: 600px) {
+  @keyframes fly-from-bottom {
+    0%   { transform: translateY(280px) scale(0.85); opacity: 0; }
+    100% { transform: translateY(0) scale(0.85); opacity: 1; }
+  }
+  @keyframes fly-from-top {
+    0%   { transform: translateY(-280px) scale(0.85); opacity: 0; }
+    100% { transform: translateY(0) scale(0.85); opacity: 1; }
+  }
+  @keyframes fly-from-left {
+    0%   { transform: translateX(-380px) scale(0.85); opacity: 0; }
+    100% { transform: translateX(0) scale(0.85); opacity: 1; }
+  }
+  @keyframes fly-from-right {
+    0%   { transform: translateX(380px) scale(0.85); opacity: 0; }
+    100% { transform: translateX(0) scale(0.85); opacity: 1; }
+  }
+}
+
+
+/* ============================================================================
+ * v2.4 复盘面板
+ * ========================================================================== */
+.replay-card {
+  background: var(--surface-panel, #1d2b22);
+  border: 1px solid var(--surface-panel-border, rgba(255,255,255,0.12));
+  border-radius: 14px;
+  width: min(860px, 94vw);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px;
+  color: #eee;
+}
+.replay-header { display: flex; align-items: center; gap: 14px; }
+.replay-header h2 { margin: 0; font-size: 20px; }
+.replay-round-tabs { flex: 1; display: flex; gap: 6px; overflow-x: auto; }
+.replay-tab {
+  background: rgba(255,255,255,0.08); border: 1px solid transparent; color: #ccc;
+  border-radius: 8px; padding: 4px 10px; cursor: pointer; font-size: 13px; white-space: nowrap;
+}
+.replay-tab.active { background: rgba(198,161,91,0.18); border-color: rgba(198,161,91,0.5); color: var(--accent-gold-lit); }
+.replay-hint { font-size: 12px; color: var(--text-muted); margin: 8px 0 10px; }
+.replay-list { overflow-y: auto; flex: 1; border-top: 1px solid rgba(255,255,255,0.08); }
+.replay-row { border-bottom: 1px solid rgba(255,255,255,0.06); }
+.replay-row-main {
+  display: flex; align-items: center; gap: 8px; padding: 6px 4px; cursor: pointer;
+  flex-wrap: wrap;
+}
+.replay-row-main:hover { background: rgba(255,255,255,0.04); }
+.replay-row.pass .replay-row-main { opacity: 0.55; }
+.replay-row.teammate .replay-row-main { background: rgba(198,161,91,0.07); }
+.replay-row.me .replay-row-main { background: rgba(198,161,91,0.05); }
+.replay-no { color: var(--text-muted); font-size: 11px; min-width: 34px; font-family: var(--font-num); }
+.replay-seat { font-size: 13px; min-width: 64px; font-weight: 600; }
+.replay-type { color: var(--accent-gold); font-size: 12px; }
+.replay-prev { color: var(--text-muted); font-size: 11px; }
+.replay-pass-label { color: var(--text-muted); font-size: 13px; }
+.replay-trib { color: var(--accent-ember); font-size: 12px; }
+.replay-chip {
+  background: rgba(120,200,120,0.15); border: 1px solid rgba(120,200,120,0.4);
+  color: #9fdf9f; border-radius: 6px; padding: 0 6px; font-size: 10px;
+}
+.replay-flag {
+  margin-left: auto; background: none; border: none; cursor: pointer;
+  font-size: 14px; opacity: 0.25; padding: 2px 6px;
+}
+.replay-flag.on { opacity: 1; filter: drop-shadow(0 0 4px rgba(255,80,80,0.8)); }
+.replay-detail { padding: 8px 12px 12px 44px; background: rgba(0,0,0,0.25); }
+.replay-hand-row { margin: 4px 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.replay-hand-name { font-size: 12px; color: var(--text-secondary); min-width: 96px; }
+.replay-npc-reason { margin-top: 8px; font-size: 12px; color: var(--accent-blue); line-height: 1.6; }
+.replay-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08);
+}
+#replay-flag-count { font-size: 13px; color: var(--text-secondary); }
+.mini-card {
+  display: inline-block; background: #f6f1e7; border-radius: 3px;
+  font-size: 11px; font-weight: 700; padding: 1px 4px; margin: 1px;
+  border: 1px solid rgba(0,0,0,0.25); line-height: 1.5;
+}
+.mini-card.red { color: #c0392b; }
+.mini-card.black { color: #222; }
+.mini-card.rj { color: #c0392b; }
+.mini-card.bj { color: #222; }
+.mini-card.wild { outline: 2px solid #f1c40f; }
+
+@media (max-width: 600px) {
+  .replay-card { width: 96vw; padding: 12px; }
+  .replay-detail { padding-left: 12px; }
+}
+
+/* v2.6 难度档说明小字 */
+.slot-desc {
+  font-size: 11px;
+  color: var(--text-muted, #8a9ba8);
+  margin-top: 6px;
+  padding-left: 2px;
+  min-height: 14px;
+}

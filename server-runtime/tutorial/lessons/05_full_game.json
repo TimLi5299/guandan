@@ -1,0 +1,36 @@
+{
+  "id": "05",
+  "title": "第一局：有引导的完整游戏",
+  "type": "full_game",
+  "currentLevel": 2,
+  "sandboxConfig": { "mode": "random", "cardsPerPlayer": 27 },
+  "npcConfig": {
+    "npcType": "teaching",
+    "level": "noob",
+    "explainMoves": true
+  },
+  "steps": [
+    {
+      "stepId": 1,
+      "prompt": "开始你的第一局完整掼蛋！三个AI对手会在出牌后简短解释自己的想法。你座位0，队友是座位2(对面)。",
+      "expectedAction": "PLAY_ANY",
+      "highlightArea": "hand",
+      "onCorrect": { "message": "出牌！观察AI的反应。" }
+    },
+    {
+      "stepId": 2,
+      "prompt": "注意看屏幕中央的出牌区——只有同牌型且更大的牌才能压上。实在压不上可以'不出'。",
+      "expectedAction": "PLAY_VALID",
+      "highlightArea": "center-play",
+      "onCorrect": { "message": "继续！保持节奏。" },
+      "onWrong": { "hint": "牌型必须和上家一样，而且要更大，或者出炸弹" }
+    },
+    {
+      "stepId": 3,
+      "prompt": "你现在是领牌(上一手是自己的)，可以自由选择任意牌型出！尝试出一手顺子或连对。",
+      "expectedAction": "PLAY_ANY",
+      "highlightArea": "hand",
+      "onCorrect": { "message": "漂亮！继续打完这局。" }
+    }
+  ]
+}

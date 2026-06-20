@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>掼蛋 · 夜局</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap');
+
+:root{
+  --bg:#070a10;
+  --bg2:#0d121c;
+  --panel:rgba(20,28,42,.55);
+  --line:rgba(120,160,220,.14);
+  --cyan:#27e8ff;
+  --cyan-dim:#0bb6d6;
+  --mag:#ff2f8e;
+  --gold:#ffd34d;
+  --txt:#cdd9ee;
+  --txt-dim:#6c7c97;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Rajdhani','Noto Sans SC',sans-serif;
+  background:var(--bg);color:var(--txt);min-height:100%;overflow-x:hidden;position:relative;
+}
+/* 霓虹光晕 + 网格 */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:
+    radial-gradient(50% 40% at 18% 8%, rgba(39,232,255,.16), transparent 60%),
+    radial-gradient(55% 45% at 88% 96%, rgba(255,47,142,.14), transparent 60%),
+    radial-gradient(40% 30% at 50% 50%, rgba(39,232,255,.05), transparent 70%);
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background-image:
+    linear-gradient(rgba(120,160,220,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120,160,220,.05) 1px, transparent 1px);
+  background-size:46px 46px;
+  mask-image:radial-gradient(80% 80% at 50% 40%, #000 30%, transparent 80%);
+}
+.frame{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:48px 40px 80px;display:flex;flex-direction:column;align-items:center}
+
+.status{
+  display:flex;align-items:center;gap:10px;font-family:'Orbitron';font-size:11px;letter-spacing:.32em;
+  color:var(--cyan);margin-bottom:40px;text-transform:uppercase;
+}
+.status .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+
+/* 标题 */
+.hero{text-align:center;margin-bottom:6px;position:relative}
+.hero .cn{
+  font-family:'Noto Sans SC';font-weight:900;font-size:120px;line-height:.9;letter-spacing:.06em;
+  color:#eaf4ff;
+  text-shadow:0 0 18px rgba(39,232,255,.55), 0 0 42px rgba(39,232,255,.3);
+}
+.hero .cn b{color:var(--mag);text-shadow:0 0 18px rgba(255,47,142,.6),0 0 46px rgba(255,47,142,.34)}
+.hero .en{
+  font-family:'Orbitron';font-weight:700;font-size:15px;letter-spacing:.6em;color:var(--cyan-dim);
+  margin-top:10px;padding-left:.6em;
+}
+.sub{font-family:'Rajdhani';font-weight:600;font-size:16px;letter-spacing:.3em;color:var(--txt-dim);margin:26px 0 40px}
+
+/* 昵称 */
+.field{width:min(460px,100%);margin-bottom:36px;position:relative}
+.field .lab{font-family:'Orbitron';font-size:10px;letter-spacing:.3em;color:var(--cyan-dim);margin-bottom:9px;text-transform:uppercase}
+.field input{
+  width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:15px 16px;color:var(--txt);font-family:'Rajdhani';font-weight:600;font-size:19px;
+  outline:none;backdrop-filter:blur(10px);transition:.25s;
+}
+.field input::placeholder{color:var(--txt-dim)}
+.field input:focus{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 0 22px -6px var(--cyan)}
+
+.section{align-self:stretch;display:flex;align-items:center;gap:14px;margin:4px 0 20px}
+.section .t{font-family:'Orbitron';font-size:13px;letter-spacing:.25em;color:var(--txt);text-transform:uppercase}
+.section .ln{flex:1;height:1px;background:linear-gradient(90deg,var(--cyan-dim),transparent)}
+
+.slots{align-self:stretch;display:grid;gap:16px}
+.slot{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;
+  backdrop-filter:blur(14px);position:relative;overflow:hidden;
+}
+.slot::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.5}
+.slot-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.role{font-family:'Rajdhani';font-weight:700;font-size:16px;letter-spacing:.12em;color:var(--txt);display:flex;align-items:center;gap:9px}
+.role .chip{font-family:'Orbitron';font-size:9px;padding:3px 8px;border-radius:5px;letter-spacing:.15em;border:1px solid;}
+.role.ally .chip{color:var(--cyan);border-color:rgba(39,232,255,.4);background:rgba(39,232,255,.08)}
+.role.foe .chip{color:var(--mag);border-color:rgba(255,47,142,.4);background:rgba(255,47,142,.08)}
+.cur{font-family:'Orbitron';font-size:15px;font-weight:700;color:var(--gold);letter-spacing:.1em;text-shadow:0 0 14px rgba(255,211,77,.5)}
+
+.tiers{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.tier{
+  text-align:center;padding:11px 4px 9px;border:1px solid var(--line);border-radius:9px;
+  background:rgba(10,16,26,.5);cursor:pointer;transition:.2s;position:relative;
+}
+.tier .ic{font-size:20px;display:block;margin-bottom:4px;opacity:.7}
+.tier .nm{font-family:'Rajdhani';font-weight:600;font-size:13px;letter-spacing:.06em;color:var(--txt-dim)}
+.tier.on{
+  border-color:var(--cyan);background:linear-gradient(180deg,rgba(39,232,255,.16),rgba(39,232,255,.04));
+  box-shadow:0 0 0 1px var(--cyan),0 0 24px -8px var(--cyan);
+}
+.tier.on .nm{color:#eaf4ff}
+.tier.on .ic{opacity:1;filter:drop-shadow(0 0 6px var(--cyan))}
+/* 等级条 */
+.bar{display:flex;gap:3px;margin-top:14px;align-items:center}
+.bar .seg{height:4px;flex:1;border-radius:2px;background:rgba(120,160,220,.16)}
+.bar .seg.f{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.bar .seg.f.hi{background:var(--mag);box-shadow:0 0 8px var(--mag)}
+.bar .pct{font-family:'Orbitron';font-size:10px;color:var(--txt-dim);margin-left:6px;letter-spacing:.1em}
+.desc{margin-top:11px;font-family:'Rajdhani';font-weight:500;font-size:13px;color:var(--txt-dim);letter-spacing:.05em}
+
+.go{
+  margin-top:38px;align-self:stretch;cursor:pointer;
+  background:linear-gradient(90deg,var(--cyan-dim),var(--cyan));color:#04121a;
+  border:none;padding:17px;border-radius:12px;
+  font-family:'Orbitron';font-weight:900;font-size:17px;letter-spacing:.35em;padding-left:.35em;
+  box-shadow:0 0 28px -6px var(--cyan);transition:.25s;text-transform:uppercase;
+}
+.go:hover{box-shadow:0 0 40px -4px var(--cyan);transform:translateY(-1px)}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="status"><span class="dot"></span>SOLO ARENA · ONLINE</div>
+
+  <div class="hero">
+    <div class="cn">掼<b>蛋</b></div>
+    <div class="en">GUANDAN</div>
+  </div>
+  <div class="sub">单 机 竞 技 · 五 档 强 AI</div>
+
+  <div class="field">
+    <div class="lab">PLAYER TAG</div>
+    <input placeholder="输入代号…">
+  </div>
+
+  <div class="section"><span class="t">Opponents</span><span class="ln"></span></div>
+
+  <div class="slots">
+    <div class="slot">
+      <div class="slot-head"><div class="role ally"><span class="chip">ALLY</span>队友</div><div class="cur">进阶 LV3</div></div>
+      <div class="tiers">
+        <div class="tier"><span class="ic">🐣</span><span class="nm">新手</span></div>
+        <div class="tier"><span class="ic">🎲</span><span class="nm">休闲</span></div>
+        <div class="tier on"><span class="ic">🎯</span><span class="nm">进阶</span></div>
+        <div class="tier"><span class="ic">🧠</span><span class="nm">高手</span></div>
+        <div class="tier"><span class="ic">👑</span><span class="nm">大师</span></div>
+      </div>
+      <div class="bar"><span class="seg f"></span><span class="seg f"></span><span class="seg f"></span><span class="seg"></span><span class="seg"></span><span class="pct">3/5</span></div>
+      <div class="desc">很少失误，要动脑</div>
+    </div>
+
+    <div class="slot">
+      <div class="slot-head"><div class="role foe"><span class="chip">FOE</span>对手一</div><div class="cur">高手 LV4</div></div>
+      <div class="tiers">
+        <div class="tier"><span class="ic">🐣</span><span class="nm">新手</span></div>
+        <div class="tier"><span class="ic">🎲</span><span class="nm">休闲</span></div>
+        <div class="tier"><span class="ic">🎯</span><span class="nm">进阶</span></div>
+        <div class="tier on"><span class="ic">🧠</span><span class="nm">高手</span></div>
+        <div class="tier"><span class="ic">👑</span><span class="nm">大师</span></div>
+      </div>
+      <div class="bar"><span class="seg f"></span><span class="seg f"></span><span class="seg f"></span><span class="seg f"></span><span class="seg"></span><span class="pct">4/5</span></div>
+      <div class="desc">残局会精算，难缠</div>
+    </div>
+
+    <div class="slot">
+      <div class="slot-head"><div class="role foe"><span class="chip">FOE</span>对手二</div><div class="cur">大师 LV5</div></div>
+      <div class="tiers">
+        <div class="tier"><span class="ic">🐣</span><span class="nm">新手</span></div>
+        <div class="tier"><span class="ic">🎲</span><span class="nm">休闲</span></div>
+        <div class="tier"><span class="ic">🎯</span><span class="nm">进阶</span></div>
+        <div class="tier"><span class="ic">🧠</span><span class="nm">高手</span></div>
+        <div class="tier on"><span class="ic">👑</span><span class="nm">大师</span></div>
+      </div>
+      <div class="bar"><span class="seg f"></span><span class="seg f"></span><span class="seg f"></span><span class="seg f"></span><span class="seg f hi"></span><span class="pct">5/5</span></div>
+      <div class="desc">全程搜索，顶级水平</div>
+    </div>
+  </div>
+
+  <button class="go">ENGAGE · 开 局</button>
+</div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "id": "04",
+  "title": "进贡与升级：赢了还要涨级",
+  "type": "lecture",
+  "currentLevel": 2,
+  "sandboxConfig": { "mode": "random", "cardsPerPlayer": 5 },
+  "steps": [
+    {
+      "stepId": 1,
+      "prompt": "掼蛋的目标：让本队尽快从'2'升到'A'！每局结束根据名次升级：双上(同队第1第2)升3级，单上升1-2级。",
+      "expectedAction": "NEXT",
+      "highlightArea": "level-display"
+    },
+    {
+      "stepId": 2,
+      "prompt": "进贡规则：非第一局开始时，上局输方需要把手里最大的牌进贡给赢方；赢方要还一张牌给输方(不能还级牌)。",
+      "expectedAction": "NEXT",
+      "highlightArea": "none"
+    },
+    {
+      "stepId": 3,
+      "prompt": "免贡：如果输方手里有两张王(对王)，可以喊'抗贡'免于进贡！这是保护自己的重要时机。",
+      "expectedAction": "NEXT",
+      "highlightArea": "none",
+      "onCorrect": { "message": "进贡规则学完了！接下来去打一局完整的游戏吧。" }
+    }
+  ]
+}
