@@ -91,6 +91,112 @@ body::after{
   width: 100%;
 }
 
+.consumer-lending-nav {
+  position: fixed;
+  top: max(18px, env(safe-area-inset-top));
+  right: max(18px, env(safe-area-inset-right));
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  padding: 10px 14px;
+  border: 1px solid rgba(198, 161, 91, 0.38);
+  border-radius: 10px;
+  background: rgba(14, 16, 20, 0.9);
+  color: var(--text-primary);
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(12px);
+}
+
+.consumer-lending-nav-kicker {
+  color: var(--accent-gold);
+  font-family: var(--font-num);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.consumer-lending-nav-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.consumer-lending-entry {
+  width: min(90%, 420px);
+  display: grid;
+  grid-template-columns: 46px 1fr auto;
+  align-items: center;
+  gap: 13px;
+  padding: 15px 17px;
+  border: 1px solid rgba(198, 161, 91, 0.32);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(198, 161, 91, 0.13), rgba(78, 140, 122, 0.08));
+  color: var(--text-primary);
+  text-align: left;
+  text-decoration: none;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.consumer-lending-entry:hover {
+  transform: translateY(-2px);
+  border-color: rgba(198, 161, 91, 0.65);
+}
+
+.consumer-lending-entry-mark {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: var(--accent-gold);
+  color: #17130d;
+  font-family: var(--font-num);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.consumer-lending-entry-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.consumer-lending-entry-copy strong {
+  font-size: 15px;
+}
+
+.consumer-lending-entry-copy small {
+  color: var(--text-secondary);
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.consumer-lending-entry-arrow {
+  color: var(--accent-gold);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+@media (max-width: 680px) {
+  .consumer-lending-nav {
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    padding: 8px 10px;
+  }
+
+  .consumer-lending-nav-kicker {
+    display: none;
+  }
+
+  .consumer-lending-nav-title {
+    font-size: 11px;
+  }
+}
+
 /* ====== 通用组件 ====== */
 .btn {
   border: none;
