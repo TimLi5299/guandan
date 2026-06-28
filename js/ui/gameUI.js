@@ -460,7 +460,7 @@ class GameUI {
     // 名次列表
     const ranksEl = document.getElementById('result-ranks');
     ranksEl.innerHTML = data.finishOrder.map((seat, idx) => {
-      const name = seat === this.mySeat ? '你' : this.getPlayerName(seat);
+      const name = seat === this.mySeat ? '你' : this._esc(this.getPlayerName(seat));
       const team = teamOf(seat);
       return `<div class="result-rank-item rank-${idx + 1}">
         <span class="rank-medal">${medals[idx]}</span>
@@ -614,9 +614,14 @@ class GameUI {
     });
   }
 
+  // 安全(code review)：HTML 转义，防昵称等数据注入(XSS)——联机版对手昵称来自远端、不可信
+  _esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
   _seatName(seat) {
     if (seat === this.mySeat) return '你';
-    return this.getPlayerName(seat);
+    return this._esc(this.getPlayerName(seat));   // 进 innerHTML，转义防 XSS
   }
 
   _miniCards(cards, currentLevel) {
@@ -646,13 +651,13 @@ class GameUI {
       row.className = `replay-row ${e.action}` + (e.seat === ((this.mySeat + 2) % 4) ? ' teammate' : '') + (e.seat === this.mySeat ? ' me' : '');
       const flagKey = `${roundIdx}:${e.idx}`;
       const flagged = this._replayFlags.has(flagKey);
-      const prevTxt = e.action === 'play' ? (e.prev ? `压 ${this._seatName(e.prev.seat)}的${e.prev.handType}` : '领牌') : '';
-      const npcChips = e.npc?.skills?.length ? e.npc.skills.map(k => `<span class="replay-chip">${k}</span>`).join('') : '';
+      const prevTxt = e.action === 'play' ? (e.prev ? `压 ${this._seatName(e.prev.seat)}的${this._esc(e.prev.handType)}` : '领牌') : '';
+      const npcChips = e.npc?.skills?.length ? e.npc.skills.map(k => `<span class="replay-chip">${this._esc(k)}</span>`).join('') : '';
       const body = e.action === 'pass'
         ? `<span class="replay-pass-label">不出</span>`
         : e.action === 'tribute' || e.action === 'return'
-          ? `<span class="replay-trib">${e.handType}</span> ${this._miniCards(e.cards, lv)}`
-          : `${this._miniCards(e.cards, lv)} <span class="replay-type">${e.handType}</span>`;
+          ? `<span class="replay-trib">${this._esc(e.handType)}</span> ${this._miniCards(e.cards, lv)}`
+          : `${this._miniCards(e.cards, lv)} <span class="replay-type">${this._esc(e.handType)}</span>`;
       row.innerHTML = `
         <div class="replay-row-main">
           <span class="replay-no">#${e.idx + 1}</span>
@@ -682,7 +687,7 @@ class GameUI {
             html += '</div>';
           }
           if (e.npc) {
-            html += `<div class="replay-npc-reason">🤖 ${e.npc.explanation || ''}${e.npc.notes?.length ? '<br>' + e.npc.notes.join('<br>') : ''}</div>`;
+            html += `<div class="replay-npc-reason">🤖 ${this._esc(e.npc.explanation || '')}${e.npc.notes?.length ? '<br>' + e.npc.notes.map(n => this._esc(n)).join('<br>') : ''}</div>`;
           }
           detail.innerHTML = html || '<div class="replay-empty">（无明细）</div>';
           detail.dataset.rendered = '1';

@@ -149,6 +149,7 @@ function classifyHand(cards, currentLevel = 2) {
     // 最小 rank 当三张），导致玩家/NPC 的高解释出牌被引擎按低解释误拒。现取 mainRank 最大解。
     let bestTriplePair = null;
     for (const r1 of regularRanks) {
+      if (r1 >= 15) continue;   // review修复：王不做三带二的三张（王三张必用万能=非法；天王炸/双王对另算）
       // 尝试把 r1 作为三张的基准
       const neededForTriple = Math.max(0, 3 - rankGroups.get(r1).length);
       if (neededForTriple <= numWilds) {
@@ -158,6 +159,7 @@ function classifyHand(cards, currentLevel = 2) {
         for (const r2 of regularRanks) {
           if (r1 === r2) continue;
           const neededForPair = Math.max(0, 2 - rankGroups.get(r2).length);
+          if (r2 >= 15 && neededForPair > 0) continue;   // review修复：王对子不可用万能补（自然双王对仍可）
           if (neededForPair <= remainingWilds) { feasible = true; break; }
         }
         // 如果没有其他 regular rank，且还有至少 2 张 wild card，则 wild card 自己成对

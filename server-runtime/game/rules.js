@@ -181,7 +181,7 @@ function findPlayableHands(handCards, lastPlay, currentLevel = 2) {
       for (const [r1, c1] of rankGroups) {
         if (c1.length < 3) continue;
         for (const [r2, c2] of rankGroups) {
-          if (r1 === r2 || c2.length !== 1) continue;
+          if (r1 === r2 || c2.length !== 1 || r2 >= 15) continue;   // review修复：王孤张不可+万能凑对（=非法王对）
           results.push([...c1.slice(0, 3), c2[0], wilds[0]]);
         }
       }
