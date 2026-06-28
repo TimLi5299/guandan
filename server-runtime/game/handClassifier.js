@@ -124,7 +124,8 @@ function classifyHand(cards, currentLevel = 2) {
 
   // === 简单类型：单张、对子、三张、炸弹 ===
   // 如果所有非万能牌 rank 相同
-  if (rankGroups.size === 1) {
+  // review 修复：万能牌不得与大小王(rank>=15)组成对/三/炸（病例：领牌甩 [大王+万能] 当对子）
+  if (rankGroups.size === 1 && !(regularRanks[0] >= 15 && numWilds > 0)) {
     const r = regularRanks[0];
     const mainRank = getNormalizedRank(r, currentLevel);
     if (n === 1) return { type: HandType.SINGLE, mainRank, length: 1, cards };

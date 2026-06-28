@@ -36,6 +36,7 @@ export const NPCConfig = {
     oppThreatBase: 10,     // 对手最少手牌 < 此 → 越少越该拦
     oppThreatWeight: 1.0,
     bombSizeCost: 3,       // 炸弹每超 4 张的保留成本（大炸弹/天王炸更该留）
+    wildBombCost: 2,       // 炸弹每含 1 张万能牌的保留成本（病例：拿两万能炸单小王=白扔）
     useThreshold: 1,       // 收益阈值
   },
 };

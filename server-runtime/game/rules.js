@@ -100,9 +100,10 @@ function findPlayableHands(handCards, lastPlay, currentLevel = 2) {
     for (const wild of wilds) {
       results.push([wild]);
     }
-    // 添加万能牌配合的对子/三张
+    // 添加万能牌配合的对子/三张（review 修复：万能牌不得与大小王 rank>=15 组牌型）
     if (numWilds >= 1) {
       for (const [rank, cards] of rankGroups) {
+        if (rank >= 15) continue;
         if (cards.length === 1) results.push([cards[0], wilds[0]]);
         if (cards.length === 2) results.push([...cards.slice(0, 2), wilds[0]]);
       }
@@ -238,6 +239,7 @@ function findPlayableHands(handCards, lastPlay, currentLevel = 2) {
     // 2. 1+1
     if (numWilds >= 1) {
       for (const [rank, cards] of rankGroups) {
+        if (rank >= 15) continue;   // review 修复：万能牌不与大小王组对
         if (cards.length === 1 && getNormalizedRank(rank, currentLevel) > lastNormalizedMain) {
           results.push([cards[0], wilds[0]]);
         }
@@ -251,6 +253,7 @@ function findPlayableHands(handCards, lastPlay, currentLevel = 2) {
     }
     if (numWilds >= 1) {
       for (const [rank, cards] of rankGroups) {
+        if (rank >= 15) continue;   // review 修复：万能牌不与大小王组三张
         if (cards.length === 2 && getNormalizedRank(rank, currentLevel) > lastNormalizedMain) {
           results.push([...cards.slice(0, 2), wilds[0]]);
         }

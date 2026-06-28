@@ -114,29 +114,8 @@
     master:   { label: '大师', icon: '👑', desc: '全程搜索，顶级水平',         skills: 'master',   error: 0 },
   };
   const PROFILE_LABELS = Object.fromEntries(Object.entries(DIFFICULTY).map(([k, v]) => [k, v.label]));
-  const SKILL_INFO = [
-    { id: 'r1_yield',          label: '让队友',   desc: '队友领牌时主动让路' },
-    { id: 'r2_bomb_timing',    label: '炸弹时机', desc: '对手快赢时精准用炸' },
-    { id: 'r3_decomp_quality', label: '拆牌优化', desc: '跟牌选破坏最小方案' },
-    { id: 'r4_memory',         label: '记牌',     desc: '记住场上已出的牌' },
-    { id: 'r5_level_guard',    label: '护大牌',   desc: '不轻易消耗级牌/万能牌' },
-    { id: 'r6_opponent_infer', label: '读对手',   desc: '推断对手无法应对的牌' },
-    { id: 'r7_signal',         label: '传信号',   desc: '出牌时向队友暗示强弱' },
-    { id: 'r8_endgame',        label: '残局',     desc: '少牌时精确规划出牌' },
-    { id: 'r9_lead_score',     label: '出牌评分', desc: '评分挑选最优领牌' },
-    { id: 'r10_adaptive_lead', label: '形势感知', desc: '按局势动态调整领牌策略' },
-    { id: 'r11_wild_decomp',   label: '万能拆牌', desc: '利用万能牌填补顺子缺口' },
-    { id: 'r12_hold_back',     label: '忍牌保型', desc: '避免破坏关键组合，适时不出' },
-    { id: 'r13_exit_plan',     label: '出口规划', desc: '快要赢时优先留下无敌后手，加速清手' },
-    { id: 's2_endgame_exact',  label: '残局精算', desc: '残局推演所有可能，找到必胜路线' },
-    { id: 'r16_min_tricks',    label: '全局算账', desc: '精确计算最少几手出完，拆牌不再凭感觉' },
-    { id: 's3_midgame_sim',    label: '中盘推演', desc: '中盘模拟数百种牌局走向，明显更优时改判' },
-    { id: 'r14_seq_guard',     label: '顺子保护', desc: '跟牌时避免用顺子破坏手型，留作主动领牌' },
-    { id: 'r15_triple_guard',  label: '三张保护', desc: '跟牌时避免拆散三带二组合，保留复合牌型' },
-    { id: 's1_endgame_search', label: '残局制胜', desc: '残局探测确定性胜利路径（大师档专属）' },
-  ];
 
-  // 每个 NPC 座位的当前配置（seat → { profile, customSkills }）
+  // 每个 NPC 座位的当前配置（seat → { profile }）
   const soloConfig = {
     2: { profile: 'advanced' },  // 队友
     1: { profile: 'advanced' },  // 对手一
@@ -163,31 +142,6 @@
     const cfg = soloConfig[seat];
     if (cfg.profile === 'master') return 'expert';
     return cfg.profile;
-  }
-
-  /** 初始化技能面板 DOM（在 bindUIEvents 之后调用一次） */
-  function initSkillPanels() {
-    for (const seat of [1, 2, 3]) {
-      const panel = document.getElementById(`skill-panel-${seat}`);
-      if (!panel) continue;
-      panel.innerHTML = `<div class="skill-panel-title">⚙️ 自选技能</div>
-        <div class="skill-grid">${SKILL_INFO.map(s => `
-          <label class="skill-item">
-            <input type="checkbox" class="skill-checkbox" data-seat="${seat}" data-skill="${s.id}">
-            <span><span class="skill-item-label">${s.label}</span><span class="skill-item-desc">${s.desc}</span></span>
-          </label>`).join('')}
-        </div>`;
-      // 绑定 checkbox 变化
-      panel.querySelectorAll('.skill-checkbox').forEach(cb => {
-        cb.addEventListener('change', () => {
-          const s = parseInt(cb.dataset.seat);
-          const skill = cb.dataset.skill;
-          const skills = soloConfig[s].customSkills;
-          if (cb.checked) { if (!skills.includes(skill)) skills.push(skill); }
-          else { const idx = skills.indexOf(skill); if (idx >= 0) skills.splice(idx, 1); }
-        });
-      });
-    }
   }
 
   /** 切换某座位的难度档（更新 UI + 状态） */

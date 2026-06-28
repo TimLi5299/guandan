@@ -460,13 +460,18 @@ function shouldUseBomb(gameState, hand, decomp, opponentNearWin, isResponding, b
   // R2 收益化：跟牌没普通牌能压时，按"抢回出牌权的价值"决定（替代原 tricks>4 一刀切禁炸）
   if (!isResponding) return false;
   const tricks = decomp.tricksNeeded;
-  const { playersHandCounts = [], seat } = gameState;
+  const { playersHandCounts = [], seat, currentLevel } = gameState;
   const oppMin = Math.min(playersHandCounts[(seat + 1) % 4] ?? 27, playersHandCounts[(seat + 3) % 4] ?? 27);
   const bombSize = bombPlay ? bombPlay.length : 4;
   let value = 0;
   value += (_B.tricksValueBase - tricks) * _B.tricksValueWeight;   // 越接近赢，抢权越值
   value += (_B.oppThreatBase - oppMin) * _B.oppThreatWeight;        // 对手越少越该拦
   value -= Math.max(0, bombSize - 4) * _B.bombSizeCost;             // 大炸弹更该留
+  // 病例修复（外科版）：仅当「拿≥2张万能的炸弹去压一张单牌」时重罚——这正是老铁标的浪费。
+  // 普通含万能炸弹（抢权/压对子+）不罚：台子证明那类是净正收益。
+  const wildInBomb = bombPlay ? bombPlay.filter(c => isWildCard(c, currentLevel)).length : 0;
+  const vsSingle = gameState.lastPlay && (gameState.lastPlay.length === 1 || gameState.lastPlay.type === HandType.SINGLE);
+  if (wildInBomb >= 2 && vsSingle) value -= wildInBomb * _B.wildBombCost;
   return value >= _B.useThreshold;
 }
 

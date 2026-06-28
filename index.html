@@ -19,10 +19,6 @@
 <body>
   <!-- ====== 返回主站（阶段 1：改造为汉堡菜单图标按钮，跳转目标不变）====== -->
   <a href="../../products.html" class="back-to-products" aria-label="返回主站">≡</a>
-  <a href="consumer-lending/index.html" class="consumer-lending-nav" aria-label="查看 Consumer Lending 日报">
-    <span class="consumer-lending-nav-kicker">FINV INTELLIGENCE</span>
-    <span class="consumer-lending-nav-title">Consumer Lending 日报</span>
-  </a>
 
   <!-- ====== 首页/大厅 ====== -->
   <div id="lobby-screen" class="screen active">
@@ -139,15 +135,6 @@
 
         <div id="lobby-status" class="status-text"></div>
       </div>
-
-      <a href="consumer-lending/index.html" class="consumer-lending-entry">
-        <span class="consumer-lending-entry-mark">CL</span>
-        <span class="consumer-lending-entry-copy">
-          <strong>全球 Consumer Lending 日报</strong>
-          <small>监管、行业、同业、消费者及关键上下游 · 每日更新</small>
-        </span>
-        <span class="consumer-lending-entry-arrow">查看 →</span>
-      </a>
 
       <div class="tutorial-section" style="display:none;"><!-- v2.0.1 产品决策：教程系统已取消，入口下线（代码保留） -->
         <h3 class="tutorial-heading">📚 新手教学</h3>
@@ -369,12 +356,11 @@
 
   <!-- 静态托管下用 ES Module loopback；其他环境用普通 WebSocket -->
   <script>
+    // 默认=静态（浏览器内置 loopback 引擎）——单机掼蛋本身不需要后端，挂到任何静态托管
+    // （Cloudflare Pages / GitHub Pages / 本地直开 / 自定义域名）都直接能玩，无需带参数。
+    // 仅 ?live=1 或 __GUANDAN_STATIC_HOST_OVERRIDE__=false 时走真服务器（将来联机版）。
     window.__GUANDAN_STATIC_HOST__ =
-      window.__GUANDAN_STATIC_HOST_OVERRIDE__ === true ||
-      location.hostname.endsWith('github.io') ||
-      location.hostname.endsWith('githubpages.io') ||
-      location.search.includes('demo=1') ||
-      location.protocol === 'file:';
+      !(window.__GUANDAN_STATIC_HOST_OVERRIDE__ === false || location.search.includes('live=1'));
     if (!window.__GUANDAN_STATIC_HOST__) {
       // 真服务器模式
       const s = document.createElement('script');

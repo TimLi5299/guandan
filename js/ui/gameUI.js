@@ -239,10 +239,7 @@ class GameUI {
     this.lastPlayedCards[seat] = { cards, handType };
     const position = this.getPlayerPosition(seat);  // 'bottom' | 'top' | 'left' | 'right'
 
-    // 任务 3.3：新出牌触发其他 quadrant 立即淡出（"下家出牌后，前一手立即淡出"）
-    ['bottom', 'top', 'left', 'right'].forEach(pos => {
-      if (pos !== position) this.fadeOutQuadrant(pos);
-    });
+    // 老铁反馈：不再淡出其他象限——保留各家最近打出的牌在桌面，方便回看别人出了什么。
 
     // 渲染目标改为中央舞台的对应 quadrant
     const stageContainer = document.getElementById(`stage-${position}`);
@@ -260,8 +257,8 @@ class GameUI {
         cardEl.style.animationDelay = `${i * 40}ms`;
       });
 
-      // 任务 3.3：2500ms 后自动淡出（duration-linger）
-      this.quadrantFadeTimers[position] = { fade: setTimeout(() => this.fadeOutQuadrant(position), 2500), clear: null };
+      // 老铁反馈：不自动淡出——本手牌一直留在桌面，到该家下次出牌时才被替换。
+      this.quadrantFadeTimers[position] = null;
     }
 
     // 中央 play-info 仍显示文字（保持 task 3.3 之前的兼容性）
@@ -306,9 +303,9 @@ class GameUI {
     this.quadrantFadeTimers[position] = null;
   }
 
-  // review-P1：一圈结束的软清——各象限淡出（替代瞬间硬清，保住赢家制胜牌的视觉余韵）
+  // 老铁反馈：新一墩【保留】各家上一墩打出的牌在桌面（不清空），方便回看"别人打过什么牌"。
+  //   每家的牌一直留到该家下次出牌时被替换；只重置中央文字标签。整桌清空只在新一局发牌时(clearAllPlayed)。
   softClearStage() {
-    ['bottom', 'top', 'left', 'right'].forEach(pos => this.fadeOutQuadrant(pos));
     document.getElementById('play-info').textContent = '';
   }
 
@@ -332,14 +329,18 @@ class GameUI {
     const position = this.getPlayerPosition(seat);
     const q = document.getElementById(`stage-${position}`);
     if (!q) return;
+    this._clearQuadrantTimers(position);
     q.classList.remove('fading-out');
     q.innerHTML = '<span class="pass-chip">不出</span>';
-    // 1.5s 后自动淡出
-    if (this.quadrantFadeTimers[position]) {
-      const t = this.quadrantFadeTimers[position];
-      clearTimeout(t.fade ?? t); clearTimeout(t.clear);
-    }
-    this.quadrantFadeTimers[position] = { fade: setTimeout(() => this.fadeOutQuadrant(position), 1500), clear: null };
+    // 老铁反馈：过牌提示闪 1.5s 后【恢复显示该家上一手实际打出的牌】，而不是清空——
+    //   桌面始终留着每家最近打出的牌，方便回看。该家没出过牌(开局即过)才留空。
+    const last = this.lastPlayedCards[seat];
+    this.quadrantFadeTimers[position] = { fade: setTimeout(() => {
+      q.classList.remove('fading-out');
+      if (last && last.cards && last.cards.length) window.CardRenderer.renderPlayedCards(q, last.cards);
+      else q.innerHTML = '';
+      this.quadrantFadeTimers[position] = null;
+    }, 1500), clear: null };
   }
 
   clearAllPlayed() {
