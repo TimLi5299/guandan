@@ -164,6 +164,21 @@ function findPlayableHands(handCards, lastPlay, currentLevel = 2) {
       }
     }
 
+    // 规则修复：A2345 最小顺子（A 当 1 垫底；2 仅此窗口可进顺）——自然牌 + 万能补缺一并枚举
+    {
+      const aLowRanks = [14, 2, 3, 4, 5];
+      const aCards = [];
+      let aGaps = 0;
+      for (const r of aLowRanks) {
+        const rCards = rankGroups.get(r);
+        if (rCards && rCards.length > 0) aCards.push(rCards[0]);
+        else aGaps++;
+      }
+      if (aCards.length > 0 && aGaps <= numWilds) {
+        results.push([...aCards, ...wilds.slice(0, aGaps)]);
+      }
+    }
+
     // 进化修复：rank 炸弹候选——free play 原来连自然炸都不枚举（NPC 领牌永远不能主动出炸），
     // 万能牌补足炸弹（3+1 / 2+2）更是全枚举器缺失（识别层支持、生成层没有 → NPC/提示永远打不出）
     for (const [rank, cards] of rankGroups) {
@@ -306,11 +321,11 @@ function findPlayableHands(handCards, lastPlay, currentLevel = 2) {
       for (const [r1, c1] of rankGroups) {
         const norm1 = getNormalizedRank(r1, currentLevel);
         if (c1.length >= 3 && norm1 > lastNormalizedMain) {
-          const singles = [...rankGroups.entries()].filter(([r2, c2]) => r2 !== r1 && c2.length === 1)
-            .sort((a, b) => a[0] - b[0]);
+          const singles = [...rankGroups.entries()].filter(([r2, c2]) => r2 !== r1 && r2 < 15 && c2.length === 1)
+            .sort((a, b) => a[0] - b[0]);   // review修复：王孤张不可+万能凑对
           if (singles.length > 0) results.push([...c1.slice(0, 3), singles[0][1][0], wilds[0]]);
         }
-        if (c1.length === 2 && norm1 > lastNormalizedMain) {
+        if (c1.length === 2 && r1 < 15 && norm1 > lastNormalizedMain) {   // review修复：王对不可+万能升三张（[王王万+对]非法）
           const pairs = [...rankGroups.entries()].filter(([r2, c2]) => r2 !== r1 && c2.length >= 2)
             .sort((a, b) => a[0] - b[0]);
           if (pairs.length > 0) results.push([...c1, wilds[0], ...pairs[0][1].slice(0, 2)]);
@@ -507,6 +522,20 @@ function findStraightFlushes(handCards, minRank = 3, maxRank = 14, currentLevel 
           }
           result.push(finalCards);
         }
+      }
+    }
+
+    // 规则修复：A2345 最小同花顺（A 当 1 垫底；2 仅此窗口可进）——本花色 A,2,3,4,5 + 万能补缺
+    {
+      const aLowRanks = [14, 2, 3, 4, 5];
+      const sel = [];
+      let need = 0;
+      for (const r of aLowRanks) {
+        const cs = cards.filter(c => c.rank === r);
+        if (cs.length > 0) sel.push(cs[0]); else need++;
+      }
+      if (sel.length > 0 && need <= wildCount) {
+        result.push([...sel, ...wilds.slice(0, need)]);
       }
     }
   }

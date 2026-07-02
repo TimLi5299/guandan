@@ -231,9 +231,33 @@ function checkStraightFlush(cards, currentLevel = 2) {
 }
 
 /**
- * 检查顺子（5+张连续，不含2和王）
+ * 检查顺子（5+张连续，不含2和王；例外：A2345——A 当 1 垫底，标准掼蛋最小顺子）
  */
 function checkStraight(cards, currentLevel) {
+  return checkStraightHigh(cards, currentLevel) || checkStraightALow(cards, currentLevel);
+}
+
+/**
+ * A2345 最小顺子（规则修复：标准掼蛋 A 可垫底当 1）。
+ * 窗口钉死 [A=1..5]：2 只有在这个窗口里才能进顺子——23456 / JQKA2 依旧非法。
+ * mainRank=5（最小顺子，被任何普通顺子压）。仅 5 张（掼蛋顺子恒 5 张）。
+ */
+function checkStraightALow(cards, currentLevel) {
+  if (cards.length !== 5) return null;
+  const regulars = cards.filter(c => !isWildCard(c, currentLevel));
+  if (regulars.length === 0) return null;
+  const seen = new Set();
+  for (const c of regulars) {
+    if (!(c.rank === 14 || (c.rank >= 2 && c.rank <= 5))) return null;  // 只许 A,2,3,4,5
+    const r = c.rank === 14 ? 1 : c.rank;   // A 当 1
+    if (seen.has(r)) return null;           // 重复不成顺
+    seen.add(r);
+  }
+  // 5 格窗口，缺口数 = 5 - 自然牌数 = 万能牌数（张数恒 5，无重复即自动成立）
+  return { type: HandType.STRAIGHT, mainRank: 5, length: 5, cards };
+}
+
+function checkStraightHigh(cards, currentLevel) {
   const n = cards.length;
   const regulars = cards.filter(c => !isWildCard(c, currentLevel));
   const numWilds = n - regulars.length;

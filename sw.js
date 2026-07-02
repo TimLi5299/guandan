@@ -1,7 +1,7 @@
 // v1.5 PWA Service Worker
 // 策略：network-first + cache fallback —— 在线时永远拿最新代码（开发/更新友好），
 // 离线时回退到缓存（单机掼蛋本来就不需要网络）。
-const CACHE = 'guandan-v2.1.4';   // code review: 三带二万能漏洞修复 + 昵称XSS转义
+const CACHE = 'guandan-v2.1.5';   // A2345 最小顺子 + 跟牌三带二王万泄漏补堵
 
 const PRECACHE = [
   './',
