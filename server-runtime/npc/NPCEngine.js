@@ -12,6 +12,8 @@ import { getTeachingNPCDecision } from './TeachingNPC.js';
 import { getLLMAIDecision, onCardsPlayed, resetMemory, syncMemoryFromHistory } from '../game/llm_ai.js';
 import { createDecisionLog, inferPrimaryReason } from './NPCDecisionLog.js';
 import { findPlayableHands } from '../game/rules.js';
+import { PERSONAS } from './Personas.js';           // 批2-① 茶馆牌友群像
+import { NPC_PRESETS } from './SkillProfiles.js';
 
 /**
  * v2.0.1 重大修复：把 engine 原始 state 适配为 PracticeNPC 期望的决策视图。
@@ -45,8 +47,16 @@ function buildDecisionView(gameState, seat, roomId) {
  */
 export async function getNPCDecision(npc, seat, hand, gameState, roomId) {
   const npcType = npc.npcType || 'practice';
-  const level = npc.level || AILevel.NORMAL;
-  const errorRate = npc.errorRate || 0;   // 难度旋钮：以ε概率随机出牌
+  // 批2-① 茶馆牌友：persona 是服务端单一数据源——技能/失误率/性格权重全由 Personas.js 解析，
+  // 客户端只传 id。无 persona 时一切与原行为完全一致。
+  const persona = (npc.persona && PERSONAS[npc.persona]) || null;
+  const level = persona ? (persona.level || AILevel.EXPERT) : (npc.level || AILevel.NORMAL);
+  const errorRate = persona ? (persona.error ?? 0) : (npc.errorRate || 0);
+  const mkView = () => {
+    const v = buildDecisionView(gameState, seat, roomId);
+    if (persona) v._personaCfg = persona.cfg;
+    return v;
+  };
 
   try {
     if (npcType === 'teaching') {
@@ -54,8 +64,8 @@ export async function getNPCDecision(npc, seat, hand, gameState, roomId) {
     }
 
     if (npcType === 'practice') {
-      // skillProfile 从前端传来是 JSON array，需要转成 Set
-      const rawProfile = npc.skillProfile ?? null;
+      // skillProfile 从前端传来是 JSON array，需要转成 Set；persona 直接取预设
+      const rawProfile = persona ? NPC_PRESETS[persona.preset] : (npc.skillProfile ?? null);
       const skillProfile = rawProfile
         ? (rawProfile instanceof Set ? rawProfile : new Set(rawProfile))
         : null;
@@ -68,10 +78,10 @@ export async function getNPCDecision(npc, seat, hand, gameState, roomId) {
           return { play, decisionLog: createDecisionLog(action, play, primaryReason) };
         } catch (e) {
           // LLM 不可用 → 走增强规则（带 roomId 取记牌器）
-          return getPracticeNPCDecision(hand, buildDecisionView(gameState, seat, roomId), level, seat, skillProfile, errorRate);
+          return getPracticeNPCDecision(hand, mkView(), level, seat, skillProfile, errorRate);
         }
       }
-      return getPracticeNPCDecision(hand, buildDecisionView(gameState, seat, roomId), level, seat, skillProfile, errorRate);
+      return getPracticeNPCDecision(hand, mkView(), level, seat, skillProfile, errorRate);
     }
 
     if (npcType === 'competitive') {

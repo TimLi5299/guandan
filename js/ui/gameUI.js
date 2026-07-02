@@ -482,6 +482,37 @@ class GameUI {
     const medals = ['🥇','🥈','🥉','4️⃣'];
     const teamOf = seat => (seat === 0 || seat === 2) ? 'team1' : 'team2';
 
+    // 批2-② 朱砂印章结算仪式：胜/负/双上/双下大印砸下+墨点飞溅，内容随后显现；点弹窗任意处跳过
+    {
+      const myUp = (this.mySeat === 0 || this.mySeat === 2) ? (data.team1Upgrade || 0) : (data.team2Upgrade || 0);
+      const oppUp = (this.mySeat === 0 || this.mySeat === 2) ? (data.team2Upgrade || 0) : (data.team1Upgrade || 0);
+      const sealTxt = myUp >= 3 ? '双上' : myUp > 0 ? '胜' : oppUp >= 3 ? '双下' : '负';
+      const card = document.querySelector('#result-overlay .result-card');
+      if (card) {
+        let seal = document.getElementById('result-seal');
+        if (!seal) {
+          seal = document.createElement('div');
+          seal.id = 'result-seal';
+          card.insertBefore(seal, card.firstChild);
+        }
+        seal.textContent = sealTxt;
+        seal.className = 'result-seal' + (myUp > 0 ? '' : ' ink') + (sealTxt.length > 1 ? ' two' : '');
+        card.classList.remove('ceremony', 'ceremony-done');
+        void card.offsetWidth;   // 重启动画
+        card.classList.add('ceremony');
+        seal.classList.add('stamping');
+        clearTimeout(this._ceremonyTimer);
+        this._ceremonyTimer = setTimeout(() => card.classList.add('ceremony-done'), 1400);
+        if (!card._ceremonySkipBound) {
+          card._ceremonySkipBound = true;
+          card.addEventListener('click', (ev) => {
+            if (ev.target.closest('button')) return;   // 按钮照常响应
+            card.classList.add('ceremony-done');
+          });
+        }
+      }
+    }
+
     // 描述行
     document.getElementById('result-desc').textContent = data.description || '';
 

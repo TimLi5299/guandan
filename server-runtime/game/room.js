@@ -6,6 +6,7 @@
 
 import { createGameState, startRound, playCards, pass, getPlayerView, getHint, GamePhase } from './engine.js';
 import { makeRng } from './deck.js';   // 批1-③ 每日一局：种子发牌
+import { PERSONAS } from '../npc/Personas.js';   // 批2-① 茶馆牌友群像
 
 class Room {
   constructor(roomId, hostId) {
@@ -50,7 +51,7 @@ class Room {
   /**
    * 添加机器人 (NPC)
    */
-  addNPC(level = 'normal', seatIndex = -1, skillProfile = null, errorRate = 0) {
+  addNPC(level = 'normal', seatIndex = -1, skillProfile = null, errorRate = 0, persona = null) {
     let targetSeat = seatIndex;
     if (targetSeat === -1 || targetSeat < 0 || targetSeat >= 4) {
       targetSeat = this.players.findIndex(p => p === null);
@@ -61,9 +62,11 @@ class Room {
     }
 
     const npcId = `npc_${Math.random().toString(36).substr(2, 9)}`;
-    // 根据 skillProfile 生成昵称：传了 skillProfile 数组 → 显示技能数，否则按 level
+    // 昵称：persona → 牌友大名；否则按 skillProfile/level（原逻辑）
     let nickname;
-    if (skillProfile !== null && Array.isArray(skillProfile)) {
+    if (persona && PERSONAS[persona]) {
+      nickname = PERSONAS[persona].name;
+    } else if (skillProfile !== null && Array.isArray(skillProfile)) {
       const n = skillProfile.length;
       const total = 9;
       if (n === 0)     nickname = '小白机器人';
@@ -83,6 +86,7 @@ class Room {
       level: level,
       skillProfile: skillProfile, // null = 按 level 默认；Array = 指定技能列表
       errorRate: errorRate,       // 难度旋钮：以ε概率随机出牌（0=满血）
+      persona: persona,           // 批2-①：牌友 id（NPCEngine 按 Personas.js 单源解析）
     };
 
     this.lastActivityAt = Date.now();

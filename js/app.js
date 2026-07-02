@@ -173,13 +173,36 @@
     return cfg.profile;
   }
 
-  /** 切换某座位的难度档（更新 UI + 状态） */
+  // 批2-① 茶馆牌友（仅展示元数据；行为/技能/失误率由服务端 Personas.js 单源解析）
+  const PERSONA_META = {
+    paozhang:   { name: '炮仗刘',   icon: '🧨', desc: '有炸就手痒，宁可炸错不肯放过 · 进阶档强度' },
+    tiesuanpan: { name: '铁算盘周', icon: '🧮', desc: '大牌捂到死，不见兔子不撒鹰 · 进阶档强度' },
+    shunliu:    { name: '顺溜马',   icon: '🐎', desc: '长牌一把梭，清手快如流水 · 进阶档强度' },
+  };
+
+  /** 切换某座位的难度档（更新 UI + 状态）；选档=取消牌友 */
   function selectProfile(seat, profile, prevProfile) {
     soloConfig[seat].profile = profile;
+    soloConfig[seat].persona = null;
+    document.querySelectorAll(`.persona-tabs[data-seat="${seat}"] .persona-tab`).forEach(t => t.classList.remove('active'));
     const nameEl = document.getElementById(`slot-name-${seat}`);
     if (nameEl) nameEl.textContent = PROFILE_LABELS[profile] || profile;
     const descEl = document.getElementById(`slot-desc-${seat}`);
     if (descEl) descEl.textContent = DIFFICULTY[profile]?.desc || '';
+  }
+
+  /** 批2-①：邀牌友上桌（覆盖难度档选择） */
+  function selectPersona(seat, personaId) {
+    const meta = PERSONA_META[personaId];
+    if (!meta) return;
+    soloConfig[seat].persona = personaId;
+    document.querySelectorAll(`.profile-tabs[data-seat="${seat}"] .profile-tab`).forEach(t => t.classList.remove('active'));
+    document.querySelectorAll(`.persona-tabs[data-seat="${seat}"] .persona-tab`).forEach(t =>
+      t.classList.toggle('active', t.dataset.persona === personaId));
+    const nameEl = document.getElementById(`slot-name-${seat}`);
+    if (nameEl) nameEl.textContent = `${meta.icon}${meta.name}`;
+    const descEl = document.getElementById(`slot-desc-${seat}`);
+    if (descEl) descEl.textContent = meta.desc;
   }
 
   // 等 gameSocket 就绪（loopback 是 ES module，异步注册到 window）
@@ -250,6 +273,9 @@
             if (dailyMode) {
               // 批1-③ 每日一局：固定进阶档三家（全球同配置，成绩可比）
               socket.addNPC('expert', seat, PROFILE_SKILLS.expert, DIFFICULTY.advanced.error);
+            } else if (soloConfig[seat].persona) {
+              // 批2-①：邀牌友上桌（id 单传，技能/失误率/性格权重由服务端 Personas.js 解析）
+              socket.addNPC('expert', seat, null, 0, soloConfig[seat].persona);
             } else {
               const level = getSeatLevel(seat);
               const skills = getSeatSkillArray(seat);
@@ -557,6 +583,14 @@
           tab.classList.add('active');
           selectProfile(seat, newProfile, prevProfile);
         });
+      });
+    });
+
+    // 批2-①：牌友 tab 绑定（选牌友=覆盖难度档；再点难度档=取消牌友）
+    document.querySelectorAll('.persona-tabs').forEach(group => {
+      const seat = parseInt(group.dataset.seat);
+      group.querySelectorAll('.persona-tab').forEach(tab => {
+        tab.addEventListener('click', () => selectPersona(seat, tab.dataset.persona));
       });
     });
 

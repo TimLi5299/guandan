@@ -453,7 +453,7 @@ function shouldYieldToTeammate(gameState, hand, currentLevel) {
  * ④ 炸弹时机
  * ========================================================== */
 function shouldUseBomb(gameState, hand, decomp, opponentNearWin, isResponding, bombPlay = null) {
-  const _B = NPCConfig.bomb;
+  const _B = gameState._personaCfg?.bomb || NPCConfig.bomb;   // 批2-① 牌友性格权重（无 persona=原行为）
   if (hand.length <= _B.handTrivial) return true;   // 残局收尾
   if (opponentNearWin) return true;                  // 拦截快赢的对手
   if (decomp.tricksNeeded <= _B.tricksLow) return true;  // 我也快赢，炸弹清场
@@ -522,7 +522,7 @@ function scoreLeadPlay(play, hand, gameState, memory, decomp, currentLevel, full
   const len = play.length;
 
   // 1. 牌型复杂度：对手越难跟，得分越高
-  const _L = NPCConfig.lead;
+  const _L = gameState._personaCfg?.lead || NPCConfig.lead;   // 批2-① 牌友性格权重（无 persona=原行为）
   if (len >= 6) score += _L.lenBonus[6];        // 长钢板/长连对
   else if (len >= 5) score += _L.lenBonus[5];   // 顺子/连对
   else if (len === 4) score += _L.lenBonus[4];  // 三带一等
