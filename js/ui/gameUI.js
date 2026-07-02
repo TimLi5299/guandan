@@ -176,6 +176,8 @@ class GameUI {
     this.renderMyHand();
     this.clearAllPlayed();
     this.resetCardCounter();   // v1.3 新局重置记牌器
+    // 批1-④ 开局满扇（27 张牌背）
+    ['top', 'left', 'right'].forEach(pos => this._renderBackfan(pos, -1));
   }
 
   updateLevelDisplay(currentLevel, team1Level, team2Level) {
@@ -377,6 +379,23 @@ class GameUI {
     if (countEl) {
       countEl.textContent = count === -1 ? '10+' : count;
     }
+    this._renderBackfan(position, count);   // 批1-④ 牌背扇随剩牌数变化
+  }
+
+  // 批1-④ 印章牌背扇：对手剩牌以牌背叠片显示（>10 脱敏时显示满扇）
+  _renderBackfan(position, count) {
+    const area = document.getElementById(`player-${position}`);
+    if (!area || position === 'bottom') return;
+    let fan = area.querySelector('.backfan');
+    if (!fan) {
+      fan = document.createElement('div');
+      fan.className = 'backfan';
+      area.appendChild(fan);
+    }
+    const n = count === -1 ? 13 : Math.max(0, Math.min(count, 13));
+    if (fan.dataset.n === String(n)) return;
+    fan.dataset.n = String(n);
+    fan.innerHTML = new Array(n).fill('<i class="cardback"></i>').join('');
   }
 
   // 更新轮次高亮
@@ -465,6 +484,28 @@ class GameUI {
 
     // 描述行
     document.getElementById('result-desc').textContent = data.description || '';
+
+    // 批1-② Par 手数标尺：标准杆 vs 实际手数（高尔夫式杆差）
+    let parEl = document.getElementById('result-par');
+    if (!parEl) {
+      parEl = document.createElement('div');
+      parEl.id = 'result-par';
+      parEl.className = 'result-par';
+      document.getElementById('result-desc')?.after(parEl);
+    }
+    if (data.par != null && data.parTricks != null) {
+      const finished = (data.finishOrder || []).includes(this.mySeat);
+      if (finished) {
+        const diff = data.parTricks - data.par;
+        const tag = diff < 0 ? `−${-diff}，超越标准杆 🏆` : diff === 0 ? '平标准杆 ✨' : `+${diff}`;
+        parEl.textContent = `🎯 标准杆 ${data.par} 手 · 你用 ${data.parTricks} 手出完（${tag}）`;
+      } else {
+        parEl.textContent = `🎯 标准杆 ${data.par} 手 · 你出了 ${data.parTricks} 手（未出完）`;
+      }
+      parEl.style.display = '';
+    } else {
+      parEl.style.display = 'none';
+    }
 
     // 名次列表
     const ranksEl = document.getElementById('result-ranks');
@@ -592,18 +633,115 @@ class GameUI {
     overlay.style.display = 'flex';
   }
 
-  /* ════════ v2.4 复盘面板 ════════ */
+  /* ════════ v2.4 复盘面板 + 批1-① 复盘史册（localStorage 近 20 场，flag 跟档持久化） ════════ */
 
-  /** 打开复盘：data = REPLAY_DATA.log（按局数组） */
-  showReplay(log) {
+  // ── 史册存储：容量超限自动驱逐最旧 ──
+  _archiveLoad() { try { return JSON.parse(localStorage.getItem('guandan_archive_v1')) || []; } catch (e) { return []; } }
+  _archiveSave(arr) {
+    for (;;) {
+      try { localStorage.setItem('guandan_archive_v1', JSON.stringify(arr)); return; }
+      catch (e) {
+        if (arr.length <= 1) { try { localStorage.removeItem('guandan_archive_v1'); } catch (e2) {} return; }
+        arr.pop();   // QuotaExceeded → 丢最旧再试
+      }
+    }
+  }
+
+  /** 静默归档当前对局（app.js 在 ROUND_END/GAME_OVER 拉到数据后调用）。isFinal=全场结束 */
+  archiveGame(log, result, isFinal) {
+    if (!log || !log.length) return;
+    this._archiveGameId = this._archiveGameId || Date.now();
+    this._liveArchiveId = this._archiveGameId;
+    const arr = this._archiveLoad();
+    const idx = arr.findIndex(e => e.id === this._archiveGameId);
+    const entry = {
+      id: this._archiveGameId, ts: Date.now(), rounds: log.length,
+      result: result ?? (idx >= 0 ? arr[idx].result : null),   // null=进行中
+      flags: [...(this._liveFlags || [])],
+      log,
+    };
+    if (idx >= 0) arr[idx] = entry; else arr.unshift(entry);
+    while (arr.length > 20) arr.pop();
+    this._archiveSave(arr);
+    if (isFinal) this._archiveGameId = null;   // 下一场开新档；_liveArchiveId 仍指本场供落 flag
+  }
+
+  /** flag 变更时持久化到所查看的档 */
+  _archivePersistFlags() {
+    if (this._viewingArchiveId == null) return;
+    const arr = this._archiveLoad();
+    const e = arr.find(x => x.id === this._viewingArchiveId);
+    if (e) { e.flags = [...this._replayFlags]; this._archiveSave(arr); }
+  }
+
+  /** 查看史册中某一场 */
+  showArchived(id) {
+    const e = this._archiveLoad().find(x => x.id === id);
+    if (!e) { this.showMessage('该记录已不存在', 2000); return; }
+    this._viewingArchiveId = id;
+    this._replayFlags = (id === this._liveArchiveId) ? (this._liveFlags ||= new Set(e.flags || []))
+                                                     : new Set(e.flags || []);
+    this._openReplayPanel(e.log);
+  }
+
+  /** 大厅入口：打开最近一场 */
+  openArchiveFromLobby() {
+    const arr = this._archiveLoad();
+    if (!arr.length) { this.showMessage('还没有存档的对局——先打一局吧', 2500); return; }
+    this.showArchived(arr[0].id);
+  }
+
+  /** 新对局边界（开始对战/继续上一局时由 app.js 调用）：换直播 flag 集 */
+  resetArchiveSession() {
+    this._liveFlags = new Set();
+    this._replayFlags = this._liveFlags;
+    this._archiveGameId = null;
+    this._liveArchiveId = null;
+    this._viewingArchiveId = null;
+  }
+
+  _renderHistorySel() {
+    const header = document.querySelector('.replay-header');
+    if (!header) return;
+    let sel = document.getElementById('replay-history-sel');
+    if (!sel) {
+      sel = document.createElement('select');
+      sel.id = 'replay-history-sel';
+      sel.className = 'replay-history-sel';
+      header.insertBefore(sel, header.firstChild);
+      sel.addEventListener('change', () => {
+        if (sel.value === 'live') this.onRequestLiveReplay?.();
+        else this.showArchived(Number(sel.value));
+      });
+    }
+    const arr = this._archiveLoad();
+    sel.innerHTML = '';
+    const mk = (v, t) => { const o = document.createElement('option'); o.value = v; o.textContent = t; sel.appendChild(o); };
+    const fmtTs = ts => { const d = new Date(ts); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+    arr.forEach(e => mk(String(e.id),
+      `${e.id === this._liveArchiveId ? '本场 · ' : ''}${fmtTs(e.ts)} · ${e.rounds}局 · ` +
+      `${e.result === 'win' ? '胜' : e.result === 'lose' ? '负' : '未完'}${e.flags?.length ? ` · 🚩${e.flags.length}` : ''}`));
+    if (!arr.length) mk('live', '本场对局');
+    const cur = this._viewingArchiveId ?? this._liveArchiveId;
+    if (cur != null) sel.value = String(cur);
+  }
+
+  _openReplayPanel(log) {
     this._replayLog = log || [];
-    this._replayFlags = this._replayFlags || new Set();   // 'round:idx' 标记集
     const overlay = document.getElementById('replay-overlay');
     if (!overlay) return;
     overlay.style.display = 'flex';
+    this._renderHistorySel();
     this._renderReplayTabs();
     const last = this._replayLog.length - 1;
     this._renderReplayRound(last >= 0 ? last : 0);
+  }
+
+  /** 打开复盘（直播视图）：data = REPLAY_DATA.log（按局数组） */
+  showReplay(log) {
+    this._replayFlags = (this._liveFlags ||= new Set());   // 直播 flag 集（单一数据源）
+    this._viewingArchiveId = this._liveArchiveId ?? null;
+    this._openReplayPanel(log);
   }
 
   hideReplay() {
@@ -708,6 +846,7 @@ class GameUI {
         else this._replayFlags.add(flagKey);
         row.querySelector('.replay-flag').classList.toggle('on');
         this._updateFlagCount();
+        this._archivePersistFlags();   // 批1-①：flag 跟档持久化（刷新不丢）
       });
       list.appendChild(row);
     }

@@ -1,7 +1,7 @@
 // v1.5 PWA Service Worker
 // 策略：network-first + cache fallback —— 在线时永远拿最新代码（开发/更新友好），
 // 离线时回退到缓存（单机掼蛋本来就不需要网络）。
-const CACHE = 'guandan-v2.1.6';   // 台面历史层(旧墩变暗) + 结算延迟看清最后一手
+const CACHE = 'guandan-v2.2.0';   // 批1: 复盘史册+Par标尺+每日一局+印章牌背/水墨桌面
 
 const PRECACHE = [
   './',

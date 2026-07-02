@@ -18,6 +18,35 @@
 
   // ====== v1.3 托管 + 读秒 ======
   let autoPlay = false;        // 托管开关
+  let pendingArchive = null;   // 批1-① 复盘史册：静默归档的待写元信息 {result, final}
+  let dailyMode = false;       // 批1-③ 每日一局：单副牌模式(日期种子,全球同牌)
+
+  // ── 批1-③ 每日一局：存取/连胜 ──
+  const dailyDateStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  const dailySeed = () => Number(dailyDateStr().replace(/-/g, ''));   // 20260628 → 全球同种子同牌
+  const dailyLoad = () => { try { return JSON.parse(localStorage.getItem('guandan_daily_v1')) || {}; } catch (e) { return {}; } };
+  const dailySave = (o) => { try { localStorage.setItem('guandan_daily_v1', JSON.stringify(o)); } catch (e) {} };
+  const dailyStreak = (rec) => {
+    let n = 0; const d = new Date();
+    for (;;) {
+      const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (rec[k]?.done) { n++; d.setDate(d.getDate() - 1); } else break;
+    }
+    return n;
+  };
+  function refreshDailyUI() {
+    const el = document.getElementById('daily-status');
+    if (!el) return;
+    const rec = dailyLoad();
+    const today = rec[dailyDateStr()];
+    const streak = dailyStreak(rec);
+    if (today?.done) {
+      const diffTxt = today.diff != null ? ` · 杆差${today.diff > 0 ? '+' + today.diff : today.diff}` : '';
+      el.textContent = `今日已完成 ${today.win ? '✅胜' : '❌负'}${diffTxt}${streak > 1 ? ` · 🔥连续${streak}天` : ''}`;
+    } else {
+      el.textContent = streak > 0 ? `🔥 已连续 ${streak} 天 · 今日一副还没打` : '每天一副全球同牌 · 比谁手数少';
+    }
+  }
   const hintCache = { key: null, idx: 0 };   // review: 提示循环游标
   let turnTimerId = null;      // 读秒 interval
   const TURN_SECONDS = 20;
@@ -218,12 +247,17 @@
         isSoloLaunch = false;
         setTimeout(() => {
           for (const seat of [1, 2, 3]) {
-            const level = getSeatLevel(seat);
-            const skills = getSeatSkillArray(seat);
-            socket.addNPC(level, seat, skills, getSeatError(seat));
+            if (dailyMode) {
+              // 批1-③ 每日一局：固定进阶档三家（全球同配置，成绩可比）
+              socket.addNPC('expert', seat, PROFILE_SKILLS.expert, DIFFICULTY.advanced.error);
+            } else {
+              const level = getSeatLevel(seat);
+              const skills = getSeatSkillArray(seat);
+              socket.addNPC(level, seat, skills, getSeatError(seat));
+            }
           }
           socket.ready();
-          setTimeout(() => socket.startGame(), 400);
+          setTimeout(() => socket.startGame(dailyMode ? dailySeed() : undefined), 400);
         }, 150);
         return; // 不跳转到房间页
       }
@@ -332,8 +366,28 @@
 
     socket.on('ROUND_END', (msg) => {
       ui.updateScorePanel(msg);
+      // 批1-① 复盘史册：局末静默拉复盘归档（结果留"未完"，全场结束时 GAME_OVER 定胜负）
+      pendingArchive = { result: null, final: false };
+      socket.send({ type: 'GET_REPLAY', silent: true });
+      // 批1-③ 每日一局：单副牌打完即记录（同日只记首次成绩）
+      if (dailyMode) {
+        const rec = dailyLoad();
+        const k = dailyDateStr();
+        if (!rec[k]?.done) {
+          const myUp = (ui.mySeat === 0 || ui.mySeat === 2) ? msg.team1Upgrade : msg.team2Upgrade;
+          const finished = (msg.finishOrder || []).includes(ui.mySeat);
+          rec[k] = {
+            done: true, win: myUp > 0,
+            par: msg.par ?? null, tricks: msg.parTricks ?? null,
+            diff: (finished && msg.par != null && msg.parTricks != null) ? msg.parTricks - msg.par : null,
+          };
+          dailySave(rec);
+        }
+      }
       // 老铁反馈：结算弹窗延迟 1.5s——让最后一手牌的出牌过程先在台面演完，别直接跳到本局结束
       setTimeout(() => {
+        const nb = document.getElementById('next-round-btn');
+        if (nb) nb.textContent = dailyMode ? '🏁 完成今日牌局' : '继续下一局';
         ui.showRoundResult(msg);
         // v1.2 音效：按我队是否升级播放胜/负/升级音
         const sm = window.soundManager;
@@ -348,6 +402,9 @@
       // v1.3 战绩：记录本场胜负
       const myTeam = (ui.mySeat === 0 || ui.mySeat === 2) ? 'team1' : 'team2';
       recordGameResult(msg.winner === myTeam);
+      // 批1-① 复盘史册：全场结束定档（胜负写入，封档）
+      pendingArchive = { result: msg.winner === myTeam ? 'win' : 'lose', final: true };
+      socket.send({ type: 'GET_REPLAY', silent: true });
       stopTurnTimer();
       // review-P1 修复：托管跨场不再残留（原先新一场开局即被 AI 代打）
       autoPlay = false;
@@ -411,8 +468,13 @@
       if (msg.seat === ui.mySeat) ui.hideTributeUI();
     });
 
-    // v2.4 复盘：服务端返回复盘数据 → 打开面板
+    // v2.4 复盘：服务端返回复盘数据 → 打开面板；silent=批1-①史册静默归档（不弹面板）
     socket.on('REPLAY_DATA', (msg) => {
+      if (msg.silent) {
+        ui.archiveGame(msg.log, pendingArchive?.result, pendingArchive?.final);
+        pendingArchive = null;
+        return;
+      }
       if (!msg.log || msg.log.length === 0) {
         ui.showMessage('暂无复盘记录（本场还没打完一手）', 2000);
         return;
@@ -509,14 +571,38 @@
         if (rbtn) rbtn.style.display = 'none';
       }
       ui.roundCount = 0;
+      ui.resetArchiveSession();   // 批1-①：新对局换直播 flag 集/开新档
+      dailyMode = false;          // 批1-③：常规对局
       const nickname = document.getElementById('nickname-input').value.trim() || '玩家';
       isSoloLaunch = true;
       socket.login(nickname);
       setTimeout(() => socket.createRoom(), 150);
     });
 
+    // ── 批1-③ 每日一局 ──
+    document.getElementById('daily-btn')?.addEventListener('click', () => {
+      if (socket.hasSave?.()) {
+        recordGameResult(false);
+        socket.clearSave?.();
+        ui.showMessage('上一局未打完，已按弃局记一败', 2500);
+        const rbtn = document.getElementById('resume-game-btn');
+        if (rbtn) rbtn.style.display = 'none';
+      }
+      ui.roundCount = 0;
+      ui.resetArchiveSession();
+      dailyMode = true;
+      const rec = dailyLoad();
+      if (rec[dailyDateStr()]?.done) ui.showMessage('今日成绩已记录，本次为练习（不覆盖成绩）', 2500);
+      const nickname = document.getElementById('nickname-input').value.trim() || '玩家';
+      isSoloLaunch = true;
+      socket.login(nickname);
+      setTimeout(() => socket.createRoom(), 150);
+    });
+    refreshDailyUI();
+
     // ── v1.1 断局恢复：继续上一局 ──
     document.getElementById('resume-game-btn')?.addEventListener('click', () => {
+      ui.resetArchiveSession();   // 批1-①：恢复局也视为新档（旧档保留为"未完"）
       const nickname = document.getElementById('nickname-input').value.trim() || '玩家';
       socket.login(nickname);
       setTimeout(() => socket.restoreGame(), 150);
@@ -555,6 +641,9 @@
     const requestReplay = () => socket.send({ type: 'GET_REPLAY' });
     document.getElementById('replay-btn-round')?.addEventListener('click', requestReplay);
     document.getElementById('replay-btn-final')?.addEventListener('click', requestReplay);
+    // 批1-① 复盘史册：大厅入口 + 历史下拉切回"本场"时的实时拉取
+    ui.onRequestLiveReplay = requestReplay;
+    document.getElementById('archive-btn')?.addEventListener('click', () => ui.openArchiveFromLobby());
     document.getElementById('replay-close-btn')?.addEventListener('click', () => ui.hideReplay());
     document.getElementById('replay-export-btn')?.addEventListener('click', () => {
       const json = ui.exportReplayFlags();
@@ -659,9 +748,16 @@
       }
     });
 
-    // 结算 - 下一局
+    // 结算 - 下一局（批1-③：每日一局单副牌，打完回大厅不续局）
     document.getElementById('next-round-btn').addEventListener('click', () => {
       ui.hideRoundResult();
+      if (dailyMode) {
+        dailyMode = false;
+        socket.clearSave?.();   // 每日局不留断局存档（防误触"继续上一局"弃局记败）
+        ui.showScreen('lobby');
+        refreshDailyUI();
+        return;
+      }
       socket.nextRound();
     });
 

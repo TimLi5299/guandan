@@ -79,7 +79,7 @@ class LoopbackSocket {
   createRoom() { this.send({ type: 'CREATE_ROOM' }); }
   joinRoom(roomId) { this.send({ type: 'JOIN_ROOM', roomId }); }
   ready() { this.send({ type: 'READY' }); }
-  startGame() { this.send({ type: 'START_GAME' }); }
+  startGame(seed) { this.send({ type: 'START_GAME', seed }); }   // 批1-③：可选种子(每日一局)
   playCards(cardIds) { this.send({ type: 'PLAY_CARDS', cardIds }); }
   pass() { this.send({ type: 'PASS' }); }
   hint() { this.send({ type: 'HINT' }); }

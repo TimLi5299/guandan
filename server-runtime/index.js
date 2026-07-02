@@ -12,6 +12,7 @@ import {
 import { startTribute, handleTribute, handleReturnTribute } from './game/engine.js';
 import { selectTributeCard, findPlayableHands } from './game/rules.js';
 import { NPC_PRESETS } from './npc/SkillProfiles.js';
+import { minTricks } from './npc/HandEvaluator.js';   // 批1-② Par 手数标尺（只读 DP）
 
 export class LoopbackServer {
   constructor(opts = {}) {
@@ -187,7 +188,7 @@ export class LoopbackServer {
           if (room.hostId !== playerId) {
             send({ type: 'ERROR', message: '只有房主可以开始游戏' }); return;
           }
-          const result = room.startGame();
+          const result = room.startGame(msg.seed);   // 批1-③：可选种子(每日一局)
           if (result.error) { send({ type: 'ERROR', message: result.error }); return; }
           this._broadcastGameEvents(room, result.events);
           break;
@@ -221,14 +222,15 @@ export class LoopbackServer {
 
         // v2.0.1 托管修复：用真 NPC 引擎（expert 档）代打，替代原"hint[0]=最小单张"
         case 'GET_REPLAY': {
-          // v2.4 复盘：返回全场记录（剥离内部字段）
+          // v2.4 复盘：返回全场记录（剥离内部字段）。批1-①：回显 silent 供客户端静默归档
+          const silent = !!msg.silent;
           const room = this.roomManager.getRoom(conn.roomId);
-          if (!room || !room.replayLog) { conn.send({ type: 'REPLAY_DATA', log: [] }); break; }
+          if (!room || !room.replayLog) { conn.send({ type: 'REPLAY_DATA', log: [], silent }); break; }
           const log = room.replayLog.map(r => ({
             round: r.round, level: r.level, team1Level: r.team1Level, team2Level: r.team2Level,
             finishOrder: r.finishOrder, entries: r.entries,
           }));
-          conn.send({ type: 'REPLAY_DATA', log });
+          conn.send({ type: 'REPLAY_DATA', log, silent });
           break;
         }
 
@@ -472,6 +474,20 @@ export class LoopbackServer {
     // ── 复盘记录器（v2.4）：每手全量记录，供局后复盘/病例导出 ──
     for (const event of events) {
       try { this._recordReplay(room, event); } catch (e) { /* 复盘记录失败不影响对局 */ }
+      // 批1-② Par 手数标尺：开打时刻(换贡后手牌定型)对人类手牌算"最少手数"标准杆，
+      // 局末在 ROUND_END 上附 par + 实际手数。只读 minTricks DP，不碰任何决策。
+      try {
+        if (event.type === 'GAME_START' && (event.phase || 'PLAYING') === 'PLAYING') {
+          const hs = room.players.findIndex(p => p && !p.isNPC);
+          room._parInfo = (hs >= 0 && room.gameState?.hands?.[hs]?.length)
+            ? { seat: hs, par: minTricks(room.gameState.hands[hs], room.gameState.currentLevel) }
+            : null;
+        } else if (event.type === 'ROUND_END' && room._parInfo) {
+          const cur = room.replayLog?.[room.replayLog.length - 1];
+          event.par = room._parInfo.par;
+          event.parTricks = cur ? cur.entries.filter(e => e.seat === room._parInfo.seat && e.action === 'play').length : null;
+        }
+      } catch (e) { /* Par 计算失败不影响对局 */ }
     }
     for (const player of room.players) {
       if (!player || player.isNPC) continue;

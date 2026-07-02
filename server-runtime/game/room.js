@@ -5,6 +5,7 @@
  */
 
 import { createGameState, startRound, playCards, pass, getPlayerView, getHint, GamePhase } from './engine.js';
+import { makeRng } from './deck.js';   // 批1-③ 每日一局：种子发牌
 
 class Room {
   constructor(roomId, hostId) {
@@ -141,13 +142,14 @@ class Room {
   /**
    * 开始游戏
    */
-  startGame() {
+  startGame(seed) {
     if (!this.allReady()) {
       return { success: false, error: '还有人没准备' };
     }
 
     this.gameState = createGameState();
-    const result = startRound(this.gameState);
+    // 批1-③ 每日一局：带种子=确定性发牌（同种子同牌）；不带=原行为(Math.random)完全不变
+    const result = startRound(this.gameState, seed ? makeRng(seed >>> 0) : undefined);
     this.gameState = result.state;
     this.lastActivityAt = Date.now();
 

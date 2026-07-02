@@ -2429,3 +2429,86 @@ body.debug-mode .npc-trace-bubble.visible {
   transform: scale(0.82);
   transition: transform 0.35s ease;
 }
+
+/* 批1-① 复盘史册：历史对局下拉 */
+.replay-history-sel {
+  background: rgba(20, 22, 28, 0.85);
+  color: var(--cream, #F6F1E4);
+  border: 1px solid rgba(198, 161, 91, 0.35);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  max-width: 240px;
+}
+.replay-history-sel:focus { outline: none; border-color: rgba(198, 161, 91, 0.7); }
+
+/* 批1-② Par 手数标尺 */
+.result-par {
+  margin: 6px 0 2px;
+  font-size: 14px;
+  color: var(--gold, #C6A15B);
+  letter-spacing: 0.03em;
+}
+
+/* 批1-③ 每日一局：状态行 */
+.daily-status {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--dim, #9a8f78);
+  text-align: center;
+  letter-spacing: 0.04em;
+  min-height: 16px;
+}
+
+/* ═══ 批1-④ 印章牌背 + 宣纸/水墨桌面 ═══ */
+/* 对手牌背扇：回纹暗红底 + 中央金印点 */
+.backfan {
+  display: flex;
+  justify-content: center;
+  margin-top: 5px;
+}
+.backfan .cardback {
+  display: block;
+  width: 14px;
+  height: 22px;
+  margin-left: -8px;
+  border-radius: 3px;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(198, 161, 91, 0.30) 0 2.5px, transparent 3.5px),
+    linear-gradient(135deg, #7d2820, #4f1813);
+  border: 1px solid rgba(255, 210, 180, 0.22);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.backfan .cardback:first-child { margin-left: 0; }
+
+/* 宣纸纤维纹理（极淡，不抢牌面） */
+#game-screen { position: relative; }
+#game-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.008) 0 1px, transparent 1px 4px);
+  mix-blend-mode: overlay;
+}
+/* 水墨呼吸：三团极淡墨晕超慢漂移（60s 一个来回，几乎潜意识级） */
+#game-screen::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(38% 30% at 22% 26%, rgba(78, 140, 122, 0.05), transparent 70%),
+    radial-gradient(46% 36% at 78% 72%, rgba(198, 161, 91, 0.045), transparent 70%),
+    radial-gradient(30% 26% at 60% 20%, rgba(179, 57, 44, 0.03), transparent 70%);
+  animation: inkDrift 60s ease-in-out infinite alternate;
+}
+@keyframes inkDrift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(3%, 2%) scale(1.06); }
+}
