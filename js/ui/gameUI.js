@@ -239,14 +239,16 @@ class GameUI {
     this.lastPlayedCards[seat] = { cards, handType };
     const position = this.getPlayerPosition(seat);  // 'bottom' | 'top' | 'left' | 'right'
 
-    // 老铁反馈：不再淡出其他象限——保留各家最近打出的牌在桌面，方便回看别人出了什么。
+    // 老铁反馈v2：保留各家最近出牌可回看，但【分层】——当前墩全亮，上一墩变暗缩小(stage-history)，
+    // 解决"历史牌太多看不清最近一轮"的问题。
+    (this._currentTrickSeats ||= new Set()).add(seat);
 
     // 渲染目标改为中央舞台的对应 quadrant
     const stageContainer = document.getElementById(`stage-${position}`);
     if (stageContainer) {
       // 任务 3.3：取消当前 quadrant 的全部旧 timer（fade + clear）+ 移除 fading-out class
       this._clearQuadrantTimers(position);
-      stageContainer.classList.remove('fading-out');
+      stageContainer.classList.remove('fading-out', 'stage-history');
 
       window.CardRenderer.renderPlayedCards(stageContainer, cards);
 
@@ -303,9 +305,14 @@ class GameUI {
     this.quadrantFadeTimers[position] = null;
   }
 
-  // 老铁反馈：新一墩【保留】各家上一墩打出的牌在桌面（不清空），方便回看"别人打过什么牌"。
-  //   每家的牌一直留到该家下次出牌时被替换；只重置中央文字标签。整桌清空只在新一局发牌时(clearAllPlayed)。
+  // 老铁反馈v2：新一墩【保留】上一墩的牌但打入历史层（变暗缩小）——可回看又不挡最近一轮。
+  //   当前墩出的牌恢复全亮（showPlayedCards 里摘掉 history 类）。整桌清空只在新一局(clearAllPlayed)。
   softClearStage() {
+    this._currentTrickSeats = new Set();
+    ['bottom', 'top', 'left', 'right'].forEach(pos => {
+      const el = document.getElementById(`stage-${pos}`);
+      if (el && el.innerHTML.trim()) el.classList.add('stage-history');
+    });
     document.getElementById('play-info').textContent = '';
   }
 
@@ -330,15 +337,16 @@ class GameUI {
     const q = document.getElementById(`stage-${position}`);
     if (!q) return;
     this._clearQuadrantTimers(position);
-    q.classList.remove('fading-out');
+    q.classList.remove('fading-out', 'stage-history');   // 「不出」提示是当前墩信息，全亮显示
     q.innerHTML = '<span class="pass-chip">不出</span>';
-    // 老铁反馈：过牌提示闪 1.5s 后【恢复显示该家上一手实际打出的牌】，而不是清空——
-    //   桌面始终留着每家最近打出的牌，方便回看。该家没出过牌(开局即过)才留空。
+    // 老铁反馈v2：过牌提示闪 1.5s 后恢复显示该家上一手牌；若那手牌属于更早的墩则进历史层（变暗）。
     const last = this.lastPlayedCards[seat];
     this.quadrantFadeTimers[position] = { fade: setTimeout(() => {
       q.classList.remove('fading-out');
-      if (last && last.cards && last.cards.length) window.CardRenderer.renderPlayedCards(q, last.cards);
-      else q.innerHTML = '';
+      if (last && last.cards && last.cards.length) {
+        window.CardRenderer.renderPlayedCards(q, last.cards);
+        if (!this._currentTrickSeats?.has(seat)) q.classList.add('stage-history');
+      } else q.innerHTML = '';
       this.quadrantFadeTimers[position] = null;
     }, 1500), clear: null };
   }
@@ -350,12 +358,13 @@ class GameUI {
     });
     // Phase 3 任务 3.2：同时清掉新的中央舞台 4 quadrant（跨局/重新发牌时）
     // Phase 3 任务 3.3：同时清掉所有自动淡出 timer，避免跨局残留
+    this._currentTrickSeats = new Set();
     ['bottom', 'top', 'left', 'right'].forEach(pos => {
       this._clearQuadrantTimers(pos);
       const el = document.getElementById(`stage-${pos}`);
       if (el) {
         el.innerHTML = '';
-        el.classList.remove('fading-out');
+        el.classList.remove('fading-out', 'stage-history');
       }
     });
     document.getElementById('play-info').textContent = '';

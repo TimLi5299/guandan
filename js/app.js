@@ -332,13 +332,16 @@
 
     socket.on('ROUND_END', (msg) => {
       ui.updateScorePanel(msg);
-      ui.showRoundResult(msg);
-      // v1.2 音效：按我队是否升级播放胜/负/升级音
-      const sm = window.soundManager;
-      const myTeamUpgrade = (ui.mySeat === 0 || ui.mySeat === 2) ? msg.team1Upgrade : msg.team2Upgrade;
-      if (myTeamUpgrade >= 2) sm?.levelUp();
-      else if (myTeamUpgrade > 0) sm?.win();
-      else sm?.lose();
+      // 老铁反馈：结算弹窗延迟 1.5s——让最后一手牌的出牌过程先在台面演完，别直接跳到本局结束
+      setTimeout(() => {
+        ui.showRoundResult(msg);
+        // v1.2 音效：按我队是否升级播放胜/负/升级音
+        const sm = window.soundManager;
+        const myTeamUpgrade = (ui.mySeat === 0 || ui.mySeat === 2) ? msg.team1Upgrade : msg.team2Upgrade;
+        if (myTeamUpgrade >= 2) sm?.levelUp();
+        else if (myTeamUpgrade > 0) sm?.win();
+        else sm?.lose();
+      }, 1500);
     });
 
     socket.on('GAME_OVER', (msg) => {
@@ -354,7 +357,7 @@
       setTimeout(() => {
         ui.hideRoundResult();
         ui.showGameOver(msg.winner, msg.finalLevel);
-      }, 1000);
+      }, 2500);   // 老铁反馈配套：错开 ROUND_END 的 1.5s 延迟(最后一手可见1.5s→局结算1s→全场结算)
     });
 
     socket.on('HINT_RESULT', (msg) => {

@@ -2417,3 +2417,15 @@ body.debug-mode .npc-trace-bubble.visible {
   padding-left: 2px;
   min-height: 14px;
 }
+
+/* 老铁反馈v2：台面历史层——上一墩的牌变暗缩小，当前墩全亮，一眼分清"最近一轮谁出了什么" */
+.stage-quadrant.stage-history {
+  opacity: 0.32;
+  filter: saturate(0.55);
+  transition: opacity 0.35s ease, filter 0.35s ease;
+}
+.stage-quadrant.stage-history .card,
+.stage-quadrant.stage-history .mini-card {
+  transform: scale(0.82);
+  transition: transform 0.35s ease;
+}
