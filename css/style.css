@@ -2600,3 +2600,51 @@ body.debug-mode .npc-trace-bubble.visible {
 .result-card.ceremony.ceremony-done #result-seal.stamping { animation: none; opacity: 1; transform: rotate(-4deg) scale(1); }
 .result-card.ceremony.ceremony-done #result-seal.stamping::before { animation: none; opacity: 0; }
 @keyframes resultReveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ═══ 老铁反馈：出牌视觉重排 v2 ═══
+ * 病根：舞台 480×220 固定框 + 四象限绝对定位，是"同时只显示一家"时代的布局；
+ * 台面常驻保留四家出牌后，宽牌型(5-6张)上下左右互压成一摞。
+ * 修法：舞台改三行网格（上=对家 / 中=西·东分居两侧 / 下=我），行与行永不重叠；
+ * 牌组内部改叠扇（负边距）收紧宽度，同一手牌像真人码在桌上。 */
+.stage-anchor {
+  width: min(94vw, 580px);
+  height: auto;
+  min-height: 248px;
+  display: grid;
+  grid-template-areas: "top top" "left right" "bottom bottom";
+  grid-template-rows: minmax(84px, auto) minmax(84px, auto) minmax(84px, auto);
+  align-items: center;
+  justify-items: center;
+  gap: 4px;
+  padding: 10px 10px;
+}
+#stage-top, #stage-left, #stage-right, #stage-bottom {
+  position: static;
+  transform: none;
+  left: auto; right: auto; top: auto; bottom: auto;
+}
+#stage-top    { grid-area: top; }
+#stage-left   { grid-area: left;  justify-self: start; }
+#stage-right  { grid-area: right; justify-self: end; }
+#stage-bottom { grid-area: bottom; }
+#stage-left, #stage-right { max-width: 49%; }
+/* "等待出牌"标签绝对居中，不参与网格 */
+.stage-anchor-label {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+}
+/* 牌组内部叠扇：像真人把一手牌码在桌上（替代 gap 平铺撑宽） */
+.stage-quadrant { gap: 0; }
+.stage-quadrant .card { margin-left: -22px; flex-shrink: 0; }
+.stage-quadrant .card:first-child { margin-left: 0; }
+/* 历史层缩放改整组缩（组内叠扇后单牌缩放会破坏叠距） */
+.stage-quadrant.stage-history .card { transform: none; }
+.stage-quadrant.stage-history { transform: scale(0.86); }
+#stage-left.stage-history  { transform-origin: left center;  transform: scale(0.86); }
+#stage-right.stage-history { transform-origin: right center; transform: scale(0.86); }
+/* 移动端：舞台跟随收窄，行高稍矮 */
+@media (max-width: 520px) {
+  .stage-anchor { width: 94vw; min-height: 216px; grid-template-rows: minmax(72px, auto) minmax(72px, auto) minmax(72px, auto); }
+  .stage-quadrant .card { margin-left: -26px; }
+}
